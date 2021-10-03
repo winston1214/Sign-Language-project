@@ -23,5 +23,19 @@
 
 <img src='https://github.com/winston1214/Sign-Langugage-project/blob/master/picture/sample_data.gif?raw=true'></img>
 
+## PreProcessing
+
+**1. Split frame**
+```
+$ python frame_split.py --source ${input_path} --output ${save_path}
+```
+**2. Extract KeyPoint(OpenPose)**
+```
+$ cd openpose
+$ wget https://github.com/winston1214/Sign-Langugage-project/blob/master/preprocessing/openpose.sh
+$ sh openpose.sh
+```
+**※ Please check frame_jpg path in shell file**
+
 ## Extract KeyPoint
 <img src='https://github.com/winston1214/Sign-Langugage-project/blob/master/picture/OpenPose_sample.gif?raw=true'></img>
