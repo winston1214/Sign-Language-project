@@ -27,12 +27,12 @@
 
 **1. Split frame**
 ```
-$ python frame_split.py --source ${video_path} --output ${save_img_path}
+$ python frame_split_colab.py --source ${video_path} --output ${save_img_path}
 ```
 **2. Extract KeyPoint(OpenPose)**
 ```
 $ cd pytorch-openpose
-$ python demo_new_open_json_new.py
+$ python demo_new_open_json_new.py --source %{input_path} --save_dir ${save path}
 ```
 **※ Please check frame_jpg path in shell file**
 
