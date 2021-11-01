@@ -19,9 +19,13 @@ hand_estimation = Hand('model/hand_pose_model.pth')
 parser = argparse.ArgumentParser(
         description="Process a video annotating poses detected.")
 parser.add_argument('--source', type=str, default='/content/drive/MyDrive/BOAZ_수어프로젝트/Data/10481_12994_frame', help='input_folder')
+parser.add_argument('--save_dir',type='str',default = '/content/drive/MyDrive/BOAZ_수어프로젝트/Data/10481_12994_frame_openpose/',help='save folder')
 args = parser.parse_args()
 
 path = args.source
+save_dir = args.save_dir
+if save_dir[-1] != '/':
+    save_dir = save_dir + '/'
 pathlist = Path('/content/drive/MyDrive/BOAZ_수어프로젝트/Data/10481_12994_frame').glob('**/*.jpg')
 
 for test_image in pathlist:
@@ -71,6 +75,6 @@ for test_image in pathlist:
         file_data["left_hand_key_point"] = all_hand_peaks[0].tolist()
         file_data["right_hand_key_point"] = all_hand_peaks[1].tolist()
 
-    with open('/content/drive/MyDrive/BOAZ_수어프로젝트/Data/10481_12994_frame_openpose/'+test_image.name.rstrip('.jpg')+'_keypoint.json','w',encoding="utf-8") as make_file:
+    with open(save_dir+test_image.name.rstrip('.jpg')+'_keypoint.json','w',encoding="utf-8") as make_file:
         json.dump(file_data, make_file, ensure_ascii=False, indent="\t")
 
