@@ -1,0 +1,8 @@
+numpy
+matplotlib
+opencv-python
+scipy
+scikit-image
+tqdm
+sk-video
+imageio
