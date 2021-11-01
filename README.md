@@ -27,13 +27,12 @@
 
 **1. Split frame**
 ```
-$ python frame_split.py --source ${input_path} --output ${save_path}
+$ python frame_split.py --source ${video_path} --output ${save_img_path}
 ```
 **2. Extract KeyPoint(OpenPose)**
 ```
-$ cd openpose
-$ wget https://github.com/winston1214/Sign-Langugage-project/blob/master/preprocessing/openpose.sh
-$ sh openpose.sh
+$ cd pytorch-openpose
+$ python demo_new_open_json_new.py
 ```
 **※ Please check frame_jpg path in shell file**
 
