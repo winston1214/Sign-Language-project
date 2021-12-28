@@ -547,11 +547,11 @@ def write_json(all_results,outputpath, form=None, for_eval=False):
                     import numpy as np
                     numpy_result = []
                     for i in range(len(result['keypoints'])):
-                        if (i+1)%3!=0:
-                            numpy_result.append(result['keypoints'][i])
+                        # if (i+1)%3!=0:
+                        numpy_result.append(result['keypoints'][i])
 
                     numpy_result = np.array(numpy_result)
-                    numpy_result = numpy_result.reshape(136, 2)
+                    numpy_result = numpy_result.reshape(-1, 3)
                     delete_list = (11,12,13,14,15,16,19,20,21,22,23,24,25)
                     numpy_result = np.delete(numpy_result,delete_list, axis=0)
 
