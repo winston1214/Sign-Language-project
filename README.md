@@ -20,7 +20,7 @@
 ## Environment
 
 - OS : Ubuntu 18.04.5(Docker) LTS or Colab
-- Cuda : 11.0
+- Cuda : 10.0
 - GPU : Tesla V100-32GB
 
 
@@ -45,7 +45,8 @@ $ sudo apt-get install libyaml-dev
 $ cd Alphapose
 $ python setup.py build develop
 ```
-If you run in a non-colab environment, refer to <a href='https://bigdata-analyst.tistory.com/328?category=908124'>this link</a>.
+
+If you don't run in the COLAB environment or the **cuda version is 10.0**, refer to <a href='https://bigdata-analyst.tistory.com/328?category=908124'>this link</a>.
 
 ## PreProcessing
 
