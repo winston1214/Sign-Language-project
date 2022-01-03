@@ -45,7 +45,7 @@ $ sudo apt-get install libyaml-dev
 $ cd Alphapose
 $ python setup.py build develop
 ```
-If you run in a non-corab environment, refer to <a href='https://bigdata-analyst.tistory.com/328?category=908124'>this link</a>.
+If you run in a non-colab environment, refer to <a href='https://bigdata-analyst.tistory.com/328?category=908124'>this link</a>.
 
 ## PreProcessing
 
