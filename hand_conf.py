@@ -7,7 +7,7 @@ def video_sampling(data,video_size):
     new_X_train = []
     result = []
     hand_frame_ls = np.array([])
-\
+
 
     for idx,i in tqdm(enumerate(data)):
         num2 = i.split('_')[3]
@@ -39,5 +39,5 @@ def video_sampling(data,video_size):
 
             X_train.append(hand_frame_ls.tolist())
             hand_frame_ls = np.array([])
-    X_train = X_train.reshape(-1,246)
+    X_train = np.array(X_train).reshape(-1,246)
     return X_train
