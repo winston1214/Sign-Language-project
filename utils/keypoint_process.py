@@ -4,8 +4,7 @@ from tqdm.notebook import tqdm
 def video_sampling(data,video_size):
     X_train=[]
     num_ls = [0]
-    new_X_train = []
-    result = []
+
     hand_frame_ls = np.array([])
 
 
@@ -39,5 +38,5 @@ def video_sampling(data,video_size):
 
             X_train.append(hand_frame_ls.tolist())
             hand_frame_ls = np.array([])
-    X_train = np.array(X_train).reshape(-1,246)
+    X_train = np.array(X_train).reshape(-1,video_size,246)
     return X_train
