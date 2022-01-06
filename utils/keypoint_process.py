@@ -1,5 +1,6 @@
 import numpy as np
 from tqdm.notebook import tqdm
+import re
 
 def video_sampling(data,video_size):
     X_train=[]
