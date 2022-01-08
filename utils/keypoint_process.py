@@ -44,6 +44,10 @@ def video_sampling(data,video_size):
 
 
 
+import numpy as np
+from tqdm.notebook import tqdm
+import re
+
 def video_sampling2(data): # original video에서 hand video 부분만 random하게 frame 증강
     np.random.seed(42)
     X_train=np.array([])
@@ -51,27 +55,34 @@ def video_sampling2(data): # original video에서 hand video 부분만 random하
     max_frame_num = 0
     min_frame_num = []
     tmp = []
+    video_set = set()
     hand_frame_ls = np.array([])
+    minimum = 1e+5
+    video_dic = {}
     video_name = [] # video 밀리는 경우 방지(frame이 0번째부터 있지 않을 수 있음)
     for idx,i in tqdm(enumerate(data)):
         num2 = i.split('_')[3]
         num2 = int(re.sub(".jpg", "", num2))
         num_ls.append(int(num2))
         video_name.append(i)
-        try:
-            if num_ls[idx+1] - num_ls[idx]<0:
-                tmp.append(num2)
-                min_frame_num.append([min(tmp)]*len(tmp))
-            else:
-                tmp.append(num2)
-                
-        except:
-            tmp.append(num2)
-            min_frame_num.append([min(tmp)]*len(tmp))
+        video_set.add('_'.join(i.split('.')[0].split('_')[:-1]))
         if max_frame_num < num2: # 최댓값 찾기
             max_frame_num = num2
             
-    min_frame_num = sum(min_frame_num,[])
+        try:
+            if num_ls[idx+1] - num_ls[idx] <0:
+                min_frame_num.append(minimum)
+                minimum = 1e+5
+            else:
+                if minimum > num2:
+                    minimum = num2
+        except:
+            if minimum > num2:
+                minimum = num2
+            min_frame_num.append(minimum)
+    for k,v in zip(video_set,min_frame_num):
+        video_dic[k] = v
+    return video_dic
     max_frame_num += 1 # 0부터 시작해서
     video_hand_idx = []
     print('max_frame_num', max_frame_num)
@@ -98,12 +109,13 @@ def video_sampling2(data): # original video에서 hand video 부분만 random하
                 hand_frame_ls = hand_frame_ls.reshape(-1,246)
                 video_frame = video_frame.reshape(-1,246)
 
-
+                print(video_dic['_'.join(video_name[idx].split('.')[0].split('_')[:-1])])
                 if video_frame.shape[0] < max_frame_num: # 비디오프레임이 최대 비디오프레임보다 적을 때
-                    if min_frame_num[idx] != 0: # 시작 프레임이 0이 아닐 때
-                        start_number = min_frame_num[idx]
+                    start_number = video_dic['_'.join(video_name[idx].split('.')[0].split('_')[:-1])]
+                    if start_number != 0: # 시작 프레임이 0이 아닐 때
                         print(start_number,idx)
                         random_choice_hand = np.random.choice(video_hand_idx,max_frame_num - num_ls[idx]+start_number-1)
+                        
                         for random_idx,h in enumerate(random_choice_hand):
                             insert_num = h+random_idx-start_number
                             video_frame = np.insert(video_frame,insert_num,video_frame[insert_num],axis=0) # 손 부분만 증강
@@ -121,6 +133,7 @@ def video_sampling2(data): # original video에서 hand video 부분만 random하
 
     #             print(video_frame.shape)
                 if video_frame.shape[0] != max_frame_num: # error check
+                    print('error!')
                     print(list(data.keys())[idx]) # error check
                     print(video_frame.shape) # error check
                 X_train = np.append(X_train,video_frame).reshape(-1,246)
