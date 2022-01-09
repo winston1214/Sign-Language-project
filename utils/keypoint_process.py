@@ -88,8 +88,6 @@ def video_sampling2(data): # original video에서 hand video 부분만 random하
     video_set = sorted(list(video_set))
     for k,v in zip(video_set,min_frame_num):
         video_dic[k] = v
-        if v != 0:
-            print(k,v)
 
     max_frame_num += 1 # 0부터 시작해서
     video_hand_idx = []
@@ -119,8 +117,9 @@ def video_sampling2(data): # original video에서 hand video 부분만 random하
 
                 if video_frame.shape[0] < max_frame_num: # 비디오프레임이 최대 비디오프레임보다 적을 때
                     start_number = video_dic['_'.join(video_name[idx].split('.')[0].split('_')[:-1])]
+                    if len(video_hand_idx) == 0: # 손이 하나도 안뽑힐 때
+                        video_hand_idx = list(range(num_ls[idx]))
                     if start_number != 0: # 시작 프레임이 0이 아닐 때
-                        print(start_number,idx)
                         random_choice_hand = np.random.choice(video_hand_idx,max_frame_num - num_ls[idx]+start_number-1)
                         
                         for random_idx,h in enumerate(random_choice_hand):
@@ -152,8 +151,10 @@ def video_sampling2(data): # original video에서 hand video 부분만 random하
 
             if video_frame.shape[0] < max_frame_num: # 비디오프레임이 최대 비디오프레임보다 적을 때
                 start_number = video_dic['_'.join(video_name[idx].split('.')[0].split('_')[:-1])]
+                if len(video_hand_idx) == 0:
+                    video_hand_idx = list(range(num_ls[idx]))
                 if start_number != 0: # 시작 프레임이 0이 아닐 때
-                    print(start_number,idx)
+                    
                     random_choice_hand = np.random.choice(video_hand_idx,max_frame_num - num_ls[idx]+start_number-1)
 
                     for random_idx,h in enumerate(random_choice_hand):
