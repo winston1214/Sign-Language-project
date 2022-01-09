@@ -26,7 +26,7 @@ random.seed(0)
 def main_train(opt):
     
     ### Data Loading
-    with gzip.open('X_train.pickle','rb') as f:
+    with gzip.open(opt.X_path + 'X_train.pickle','rb') as f:
         X_data = pickle.load(f)
     excel_name = opt.excel_name # 'C:/Users/winst/Downloads/menmen/train_target.xlsx'
     vocab,decoder_input = target_preprocessing(excel_name)
@@ -100,6 +100,7 @@ def main_train(opt):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Sign-Language-Train')
+    parser.add_argument('--X_path',type=str,default='./',help = 'X_train.pikcle path')
     parser.add_argument('--hid_dim', type=int, default=512,help='Number of hidden demension')
     parser.add_argument('--dropout',type=float,default=0.5,help = 'dropout ratio')
     parser.add_argument('--emb_dim',type=int,default=128,help = 'Nuber of embedding demension')
@@ -110,4 +111,4 @@ if __name__ == '__main__':
     parser.add_argument('--excel_name',type=str,default='train_target.xlsx',help='Target Excel name')
     parser.add_argument('--model',type=str,default='GRU',help='[LSTM,GRU]')
     opt = parser.parse_args()
-    main_train(opt)    
+    main_train(opt)
