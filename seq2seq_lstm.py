@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import random
 
 
 device = 'device:0' if torch.cuda.is_available() else 'cpu'
@@ -61,7 +62,7 @@ class Decoder(nn.Module):
         #out1 = self.fc(out1[:, -1, :])
         
         return prediction,hidden, cell
-import random
+
 class Seq2Seq(nn.Module):
 
     def __init__(self, encoder, decoder, device):

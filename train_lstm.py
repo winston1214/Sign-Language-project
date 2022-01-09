@@ -6,9 +6,11 @@ import torch.utils.data as D
 import torch.backends.cudnn as cudnn
 import random
 import numpy as np
-import gzip,pikcle
+import gzip,pickle
 import math
 import time
+import argparse
+from tqdm.notebook import tqdm
 
 torch.manual_seed(0)
 torch.cuda.manual_seed(0)
@@ -105,25 +107,25 @@ def epoch_time(start_time, end_time):
     elapsed_secs = int(elapsed_time - (elapsed_mins * 60))
     return elapsed_mins, elapsed_secs
         
-if __name__ == '__main__':
+def main_train(opt):
     
     ### Data Loading
     with gzip.open('X_train.pickle','rb') as f:
-        X_data = pikcle.load(f)
-    excel_name = ''
+        X_data = pickle.load(f)
+    excel_name = opt.excel_name # 'C:/Users/winst/Downloads/menmen/train_target.xlsx'
     vocab,decoder_input = target_preprocessing(excel_name)
 
     ## Setting of Hyperparameter
-    HID_DIM = 512
+    HID_DIM = opt.hid_dim # 512
     OUTPUT_DIM = len(vocab)+1
     N_LAYERS = 2
-    DEC_DROPOUT = 0.5
-    emb_dim = 128
-    BATCH_SIZE = 16
-    N_EPOCHS = 2
+    DEC_DROPOUT = opt.dropout # 0.5
+    emb_dim = opt.emb_dim # 128
+    BATCH_SIZE = opt.batch # 32
+    N_EPOCHS = opt.epochs # 50
     CLIP = 1
-    model_save_path = 'pt_file/'
-    save_model_name = 'model1.pt'
+    model_save_path = opt.save_path # 'pt_file/'
+    save_model_name = opt.pt_name # 'model1.pt'
     device = torch.device('cuda' if torch.cuda.is_available else 'cpu')
     print('device : ', device)
 
@@ -155,7 +157,7 @@ if __name__ == '__main__':
     best_valid_loss = float('inf')
 
 
-    for epoch in range(N_EPOCHS):
+    for epoch in tqdm(range(N_EPOCHS)):
         start_time = time.time()
 
         train_loss = train(model, train_dataloader, optimizer, criterion, CLIP)
@@ -166,8 +168,22 @@ if __name__ == '__main__':
 
         if valid_loss < best_valid_loss:
             best_valid_loss = valid_loss
-            torch.save(model.state_dict(), '/content/drive/MyDrive/BOAZ_수어프로젝트/model/model1.pt')
+            torch.save(model.state_dict(), f'{model_save_path}{save_model_name}')
         
         print(f'Epoch: {epoch + 1:02} | Time: {epoch_mins}m {epoch_secs}s')
         print(f'\t Train Loss: {train_loss:.3f} | Train PPL: {math.exp(train_loss):7.3f}')
         print(f'\t Val Loss: {valid_loss:.3f} | Val PPL: {math.exp(valid_loss):7.3f}')
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Sign-Language-Train')
+    parser.add_argument('--hid_dim', type=int, defualt=512,help='Number of hidden demension')
+    parser.add_argument('--dropout',type=float,default=0.5,help = 'dropout ratio')
+    parser.add_argument('--emb_dim',type=int,default=128,help = 'Nuber of embedding demension')
+    parser.add_argument('--batch',type=int,default = 32,help='BATCH SIZE')
+    parser.add_argument('--epochs',type=int, default = 50, help='EPOCH')
+    parser.add_argument('--save_path',type=str,default='pt_file',help='model save path')
+    parser.add_argument('--pt_name',type=str,default='model1.pt',help='save model name')
+    parser.add_argument('--excel_name',type=str,default='train_target.xlsx',help='Target Excel name')
+    opt = parser.parse_args()
+    main_train(opt)    
