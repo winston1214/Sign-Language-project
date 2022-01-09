@@ -3,7 +3,7 @@ import torch.nn as nn
 import random
 
 
-device = 'device:0' if torch.cuda.is_available() else 'cpu'
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 class LSTM_Encoder(nn.Module):
     def __init__(self, input_size, hid_dim, n_layers):
         super().__init__() 

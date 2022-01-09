@@ -9,7 +9,7 @@ np.random.seed(0)
 
 
 # Encoder 정의하기 
-device = 'device:0' if torch.cuda.is_available() else 'cpu'
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 class GRU_AT_Encoder(nn.Module):
     def __init__(self, input_size, hid_dim, n_layers):
         super().__init__() 

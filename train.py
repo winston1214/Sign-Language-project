@@ -42,7 +42,7 @@ def main_train(opt):
     CLIP = 1
     model_save_path = opt.save_path # 'pt_file/'
     save_model_name = opt.pt_name # 'model1.pt'
-    device = torch.device('cuda' if torch.cuda.is_available else 'cpu')
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print('device : ', device)
 
     ## Change data type
