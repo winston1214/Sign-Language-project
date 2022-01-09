@@ -4,6 +4,7 @@ import re
 import os
 import sys
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+
 from utils.pad_sequences import pad_sequences
 
 import nltk
@@ -63,7 +64,7 @@ def target_preprocessing(excel_name):
     decoder_input = pad_sequences(encoded_sentences, maxlen=max_tar_len, padding='post')
 
     return vocab,decoder_input
-if __name__ == '__main__':
-    vocab,decoder_input = target_preprocessing('C:/Users/winst/Downloads/menmen/train_target.xlsx')
-    print('vocab',vocab)
-    print('decoder_input',decoder_input.shape)
+# if __name__ == '__main__':
+#     vocab,decoder_input = target_preprocessing('C:/Users/winst/Downloads/menmen/train_target.xlsx')
+#     print('vocab',vocab)
+#     print('decoder_input',decoder_input.shape)

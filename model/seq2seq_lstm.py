@@ -4,7 +4,7 @@ import random
 
 
 device = 'device:0' if torch.cuda.is_available() else 'cpu'
-class Encoder(nn.Module):
+class LSTM_Encoder(nn.Module):
     def __init__(self, input_size, hid_dim, n_layers):
         super().__init__() 
         self.hid_dim = hid_dim
@@ -31,7 +31,7 @@ class Encoder(nn.Module):
         # output : (BATCH_SIZE, SEQ_LENGTH, HIDDEN_SIZE) tensors. 
         
         return hidden, cell
-class Decoder(nn.Module):
+class LSTM_Decoder(nn.Module):
     def __init__(self, output_dim,  emb_dim, hid_dim, n_layers, dropout):
         super().__init__() 
 
@@ -63,7 +63,7 @@ class Decoder(nn.Module):
         
         return prediction,hidden, cell
 
-class Seq2Seq(nn.Module):
+class LSTM_Seq2Seq(nn.Module):
 
     def __init__(self, encoder, decoder, device):
         super().__init__()

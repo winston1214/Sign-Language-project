@@ -1,5 +1,7 @@
-from seq2seq_lstm import Encoder,Decoder,Seq2Seq
-from seq2seq_preprocessing import  target_preprocessing
+from model.seq2seq_lstm import LSTM_Encoder,LSTM_Decoder,LSTM_Seq2Seq
+from model.seq2seq_gru_attention import GRU_AT_Decoder, GRU_AT_Encoder, GRU_AT_Seq2Seq, Attention
+from utils.seq2seq_preprocessing import  target_preprocessing
+from utils.train_utils import train,evaluate,epoch_time,init_weights
 import torch
 import torch.nn as nn
 import torch.utils.data as D
@@ -20,92 +22,6 @@ cudnn.benchmark = False
 cudnn.deterministic = True
 random.seed(0)
 
-def init_weights(m):
-    for name, param in m.named_parameters():
-        nn.init.uniform_(param.data, -0.08, 0.08)
-
-def train(model, dataloader, optimizer, criterion, clip):
-    
-    model.train()
-    
-    epoch_loss = 0
-   
-    for i, (input, target) in enumerate(dataloader):
-
-        src = input
-        trg = target
-
-        if torch.cuda.is_available():
-            model.cuda()
-            src = src.cuda().float()
-            trg = trg.cuda()
-       
-        # src = [16, 81, 246] batch, frame수, keypoint수
-        # trg(trg)= [16, 12] = batch, trg_len
-
-        optimizer.zero_grad()        
-        
-        output = model(src, trg)
-        #trg = [trg len, batch size] [16,12]
-        #output = [trg len, batch size, output dim]
-        
-        output = output[1:].view(-1, OUTPUT_DIM)
-        trg = torch.transpose(trg,0,1)
-        trg = trg[1:].contiguous().view(-1)
-              
-        #trg = [(trg len - 1) * batch size]
-        #output = [(trg len - 1) * batch size, output dim]
-        loss = criterion(output, trg)
-        
-        loss.backward()
-        
-        torch.nn.utils.clip_grad_norm_(model.parameters(), clip)
-        
-        optimizer.step()
-        
-        epoch_loss += loss.item()
-        
-    return epoch_loss / len(dataloader)
-
-
-def evaluate(model, dataloader, criterion):
-    
-    model.eval()
-    
-    epoch_loss = 0
-    
-    with torch.no_grad():
-   
-      for i,(input, target) in enumerate(dataloader): # valid_dataloader 정의하기
-            src = input
-            trg = target
-
-            if torch.cuda.is_available():
-                model.cuda()
-                src = src.cuda().float()
-                trg = trg.cuda()
-
-            output = model(src, trg, 0)
-            #trg = [trg len, batch size] [16,12]
-            #output = [trg len, batch size, output dim]
-            
-            output = output[1:].view(-1, OUTPUT_DIM)
-            trg = torch.transpose(trg,0,1)
-            trg = trg[1:].contiguous().view(-1)
-                
-            #trg = [(trg len - 1) * batch size]
-            #output = [(trg len - 1) * batch size, output dim]
-            loss = criterion(output, trg)
-            
-            epoch_loss += loss.item()
-            
-    return epoch_loss / len(dataloader)
-
-def epoch_time(start_time, end_time):
-    elapsed_time = end_time - start_time
-    elapsed_mins = int(elapsed_time / 60)
-    elapsed_secs = int(elapsed_time - (elapsed_mins * 60))
-    return elapsed_mins, elapsed_secs
         
 def main_train(opt):
     
@@ -142,9 +58,16 @@ def main_train(opt):
 
 
     ## Define Model
-    enc = Encoder(input_size, HID_DIM, N_LAYERS)
-    dec = Decoder(OUTPUT_DIM, emb_dim, HID_DIM, N_LAYERS, DEC_DROPOUT)
-    model = Seq2Seq(enc, dec, device).to(device)
+    if opt.model == 'LSTM':
+        enc = LSTM_Encoder(input_size, HID_DIM, N_LAYERS)
+        dec = LSTM_Decoder(OUTPUT_DIM, emb_dim, HID_DIM, N_LAYERS, DEC_DROPOUT)
+        model = LSTM_Seq2Seq(enc, dec, device).to(device)
+    if opt.model == 'GRU':
+        enc = GRU_AT_Encoder(input_size, HID_DIM, N_LAYERS)
+        att = Attention(HID_DIM)
+        dec = GRU_AT_Decoder(OUTPUT_DIM, emb_dim, HID_DIM, N_LAYERS, att, DEC_DROPOUT)
+        model = GRU_AT_Seq2Seq(enc,dec,device).to(device)
+
     model.apply(init_weights)
 
     ## Loss & Optimizer
@@ -160,9 +83,9 @@ def main_train(opt):
     for epoch in tqdm(range(N_EPOCHS)):
         start_time = time.time()
 
-        train_loss = train(model, train_dataloader, optimizer, criterion, CLIP)
-        valid_loss = evaluate(model, val_dataloader, criterion)
-
+        train_loss = train(model, train_dataloader, OUTPUT_DIM, optimizer, criterion, CLIP)
+        valid_loss = evaluate(model, val_dataloader, OUTPUT_DIM,criterion)
+ 
         end_time = time.time()
         epoch_mins, epoch_secs = epoch_time(start_time, end_time)
 
@@ -177,7 +100,7 @@ def main_train(opt):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Sign-Language-Train')
-    parser.add_argument('--hid_dim', type=int, defualt=512,help='Number of hidden demension')
+    parser.add_argument('--hid_dim', type=int, default=512,help='Number of hidden demension')
     parser.add_argument('--dropout',type=float,default=0.5,help = 'dropout ratio')
     parser.add_argument('--emb_dim',type=int,default=128,help = 'Nuber of embedding demension')
     parser.add_argument('--batch',type=int,default = 32,help='BATCH SIZE')
@@ -185,5 +108,6 @@ if __name__ == '__main__':
     parser.add_argument('--save_path',type=str,default='pt_file',help='model save path')
     parser.add_argument('--pt_name',type=str,default='model1.pt',help='save model name')
     parser.add_argument('--excel_name',type=str,default='train_target.xlsx',help='Target Excel name')
+    parser.add_argument('--model',type=str,default='GRU',help='[LSTM,GRU]')
     opt = parser.parse_args()
     main_train(opt)    
