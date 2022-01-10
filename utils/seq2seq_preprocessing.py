@@ -16,7 +16,7 @@ def target_preprocessing(excel_name):
     
     nltk.download('punkt')
 
-    target = pd.read_excel(excel_name)
+    target = pd.read_csv(excel_name)
     
     # 여기서 추출하는 과정 거쳐야함(원하는 인덱스 비디오만 추출하는 과정)
     target1 = target[(target['num'] <= 35620) & (target['num'] >= 30593)]
@@ -57,7 +57,7 @@ def target_preprocessing(excel_name):
     for sentence in preprocessed_sentences:
         encoded_sentence = []
         for word in sentence:
-          encoded_sentence.append(word_to_index[word])
+            encoded_sentence.append(word_to_index[word])
         encoded_sentences.append(encoded_sentence)
 
     max_tar_len = max(map(lambda x: len(x),temp))
