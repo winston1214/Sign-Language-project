@@ -64,7 +64,7 @@ def target_preprocessing(excel_name):
     max_tar_len = max(map(lambda x: len(x),temp))
     decoder_input = pad_sequences(encoded_sentences, maxlen=max_tar_len, padding='post')
 
-    return vocab,decoder_input
+    return word_to_index,max_tar_len,vocab,decoder_input
 # if __name__ == '__main__':
 #     vocab,decoder_input = target_preprocessing('C:/Users/winst/Downloads/menmen/train_target.xlsx')
 #     print('vocab',vocab)

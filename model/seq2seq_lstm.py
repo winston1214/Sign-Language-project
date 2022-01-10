@@ -77,7 +77,7 @@ class LSTM_Seq2Seq(nn.Module):
         assert encoder.n_layers == decoder.n_layers, \
             "Encoder and decoder must have equal number of layers!"
         
-    def forward(self, src, trg, teacher_forcing_ratio = 0.8):
+    def forward(self, src, trg, teacher_forcing_ratio = 0.5):
         
     
         batch_size = trg.shape[0] # 16 batch_size

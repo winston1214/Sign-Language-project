@@ -1,7 +1,7 @@
 from model.seq2seq_lstm import LSTM_Encoder,LSTM_Decoder,LSTM_Seq2Seq
 from model.seq2seq_gru_attention import GRU_AT_Decoder, GRU_AT_Encoder, GRU_AT_Seq2Seq, Attention
 from utils.seq2seq_preprocessing import  target_preprocessing
-from utils.train_utils import train,evaluate,epoch_time,init_weights
+from utils.train_utils import train,BLEU_Evaluate,epoch_time,init_weights
 import torch
 import torch.nn as nn
 import torch.utils.data as D
@@ -29,7 +29,7 @@ def main_train(opt):
     with gzip.open(opt.X_path + 'X_train.pickle','rb') as f:
         X_data = pickle.load(f)
     excel_name = opt.csv_name # 'C:/Users/winst/Downloads/menmen/train_target.xlsx'
-    vocab,decoder_input = target_preprocessing(excel_name)
+    word_to_index, max_len, vocab,decoder_input = target_preprocessing(excel_name)
 
     ## Setting of Hyperparameter
     HID_DIM = opt.hid_dim # 512
@@ -84,7 +84,7 @@ def main_train(opt):
         start_time = time.time()
 
         train_loss = train(model, train_dataloader, OUTPUT_DIM, optimizer, criterion, CLIP)
-        BLEU = BLEU_Evaluate(model,val_dataloader,criterion, word_to_index, OUTPUT_DIM, device)
+        valid_loss, BLEU = BLEU_Evaluate(model,val_dataloader,criterion, word_to_index, OUTPUT_DIM, device,max_len)
         # valid_loss = evaluate(model, val_dataloader, OUTPUT_DIM,criterion)
  
         end_time = time.time()
@@ -96,7 +96,8 @@ def main_train(opt):
         
         print(f'Epoch: {epoch + 1:02} | Time: {epoch_mins}m {epoch_secs}s')
         print(f'\t Train Loss: {train_loss:.3f} | Train PPL: {math.exp(train_loss):7.3f}')
-        print(f'\t Val Loss: {valid_loss:.3f} | Val PPL: {math.exp(valid_loss):7.3f}')
+        print(f'\t Val Loss: {valid_loss:.3f} | Val PPL: {math.exp(valid_loss):7.3f} | Val BLEU: {BLEU: .3f}')
+
 
 
 if __name__ == '__main__':

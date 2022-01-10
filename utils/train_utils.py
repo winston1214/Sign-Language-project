@@ -5,6 +5,7 @@ import torch.nn as nn
 import numpy as np
 import random
 import nltk.translate.bleu_score as bleu
+import re
 
 
 torch.manual_seed(0)
@@ -114,7 +115,7 @@ def translate_SL(src, word_to_index, model, device, max_len = 81):
   
     trg_indexes = [word_to_index['s']]
 
-    for i in range(max_len):
+    for _ in range(max_len):
         # trg_tensor = torch.LongTensor([trg_indexes[-1]]).to(device)
         trg_tensor = torch.tensor([trg_indexes[-1]],dtype=torch.long).to(device)
         # print(trg_tensor)
@@ -132,14 +133,14 @@ def translate_SL(src, word_to_index, model, device, max_len = 81):
         # trg_tokens = [trg_field.vocab.itos[i] for i in trg_indexes]
         # trg_tokens = [word_to_index[i] for i in trg_indexes]
   
-  trg_tokens = [list(word_to_index)[i] for i in trg_indexes]
+    trg_tokens = [list(word_to_index)[i] for i in trg_indexes]
 
 
     # trg_tokens = [key for key, value in word_to_index.items() if value == i]
 
 
     # 첫 번째 <sos>는 제외하고 출력 문장 반환
-  return trg_tokens[1:]
+    return trg_tokens[1:]
 
 def BLEU_Evaluate(model,dataloader,criterion, word_to_index,OUTPUT_DIM , device, max_len = 12):
     '''
@@ -157,13 +158,13 @@ def BLEU_Evaluate(model,dataloader,criterion, word_to_index,OUTPUT_DIM , device,
         if torch.cuda.is_available():
             model.cuda()
             src = src.cuda().float()
-            src2 = src
+
             trg = trg.cuda()
             trg2 = trg
 
         with torch.no_grad(): # evaluation
             
-            hidden, cell = model.encoder(src)
+            # hidden, cell = model.encoder(src)
             output = model(src,trg,0) # evaluate
             output = output[1:].view(-1,OUTPUT_DIM) # evaluate
             trg = torch.transpose(trg,0,1) # evaluate
@@ -178,14 +179,13 @@ def BLEU_Evaluate(model,dataloader,criterion, word_to_index,OUTPUT_DIM , device,
             ref = list(word_to_index)[target[1]]
             
             candidate = ' '.join(translate_SL(input_data, word_to_index, model, device))
-            reg = re.sub('[sf]','',ref)
-            # print('candidate',candidate)
-            # print('reg',reg)
+            ref = re.sub('[sf]','',ref)
+
             BLEU += bleu.sentence_bleu(ref.split(), candidate.split(), weights = (0.5, 0.5), smoothing_function=chencherry.method4, auto_reweigh=False)
 
 
     # 첫 번째 <sos>는 제외하고 출력 문장 반환
-    return BLEU / len(dataloader)
+    return epoch_loss / len(dataloader), BLEU / len(dataloader)
 
 def epoch_time(start_time, end_time):
     elapsed_time = end_time - start_time
