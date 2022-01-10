@@ -28,7 +28,7 @@ def main_train(opt):
     ### Data Loading
     with gzip.open(opt.X_path + 'X_train.pickle','rb') as f:
         X_data = pickle.load(f)
-    excel_name = opt.excel_name # 'C:/Users/winst/Downloads/menmen/train_target.xlsx'
+    excel_name = opt.csv_name # 'C:/Users/winst/Downloads/menmen/train_target.xlsx'
     vocab,decoder_input = target_preprocessing(excel_name)
 
     ## Setting of Hyperparameter
@@ -108,7 +108,7 @@ if __name__ == '__main__':
     parser.add_argument('--epochs',type=int, default = 50, help='EPOCH')
     parser.add_argument('--save_path',type=str,default='pt_file',help='model save path')
     parser.add_argument('--pt_name',type=str,default='model1.pt',help='save model name')
-    parser.add_argument('--excel_name',type=str,default='train_target.xlsx',help='Target Excel name')
+    parser.add_argument('--csv_name',type=str,default='train_target.csv',help='Target Excel name')
     parser.add_argument('--model',type=str,default='GRU',help='[LSTM,GRU]')
     opt = parser.parse_args()
     main_train(opt)
