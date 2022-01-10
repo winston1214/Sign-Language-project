@@ -84,7 +84,8 @@ def main_train(opt):
         start_time = time.time()
 
         train_loss = train(model, train_dataloader, OUTPUT_DIM, optimizer, criterion, CLIP)
-        valid_loss = evaluate(model, val_dataloader, OUTPUT_DIM,criterion)
+        BLEU = BLEU_Evaluate(model,val_dataloader,criterion, word_to_index, OUTPUT_DIM, device)
+        # valid_loss = evaluate(model, val_dataloader, OUTPUT_DIM,criterion)
  
         end_time = time.time()
         epoch_mins, epoch_secs = epoch_time(start_time, end_time)
