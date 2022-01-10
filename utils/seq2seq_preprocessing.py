@@ -48,11 +48,10 @@ def target_preprocessing(excel_name):
     vocab_sorted = sorted(vocab.items(), key = lambda x:x[1], reverse = True)
 
     word_to_index = {}
-    i = 0
-    for (word, frequency) in vocab_sorted :
-        if frequency > 0 : # 빈도수가 작은 단어는 제외.안해!!!
-            i = i + 1 # 왜 index번호가 1부터 들어가는지 체크
-            word_to_index[word] = i
+    
+    for i,(word, frequency) in enumerate(vocab_sorted) :
+
+        word_to_index[word] = i
 
 
     encoded_sentences = [] # 각 글자에 index 부여
