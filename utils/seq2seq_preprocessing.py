@@ -22,7 +22,9 @@ def target_preprocessing(excel_name):
     target1 = target[(target['num'] <= 35620) & (target['num'] >= 30593)]
     target2 = target[(target['num'] <= 42131) & (target['num'] >= 40028)]
     target = target1.append(target2)
-
+    drop_idx = target.loc[(target['num']== 41098) | (target['num'] == 41106) | (target['num'] == 41108)].index
+    target.drop(drop_idx,axis=0,inplace=True)
+    
     target = target['target'].map(lambda x: re.sub('[(-,)=.#/?:$}]','', x)) # 부가적인 전처리
     target = target.apply(lambda x : 's '+ x + ' f')
 
