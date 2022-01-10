@@ -142,7 +142,7 @@ def translate_SL(src, word_to_index, model, device, max_len = 81):
     # 첫 번째 <sos>는 제외하고 출력 문장 반환
     return trg_tokens[1:]
 
-def BLEU_Evaluate(model,dataloader,criterion, word_to_index,OUTPUT_DIM , device, max_len = 12):
+def BLEU_Evaluate(model,dataloader,criterion, word_to_index,OUTPUT_DIM , device, max_len = 81):
     '''
     src: 번역하고자 하는 keypoint
     word_to_index: korean index 뭉치
@@ -178,7 +178,7 @@ def BLEU_Evaluate(model,dataloader,criterion, word_to_index,OUTPUT_DIM , device,
             print(target[1])
             ref = list(word_to_index)[target[1]]
             
-            candidate = ' '.join(translate_SL(input_data, word_to_index, model, device))
+            candidate = ' '.join(translate_SL(input_data, word_to_index, model, device,max_len))
             ref = re.sub('[sf]','',ref)
 
             BLEU += bleu.sentence_bleu(ref.split(), candidate.split(), weights = (0.5, 0.5), smoothing_function=chencherry.method4, auto_reweigh=False)
