@@ -4,6 +4,7 @@ import torch.nn as nn
 
 import numpy as np
 import random
+import nltk.translate.bleu_score as bleu
 
 
 torch.manual_seed(0)
@@ -94,6 +95,97 @@ def evaluate(model, dataloader,OUTPUT_DIM, criterion):
             epoch_loss += loss.item()
             
     return epoch_loss / len(dataloader)
+
+def translate_SL(src, word_to_index, model, device, max_len = 81):
+    '''
+    src: 번역하고자 하는 keypoint
+    word_to_index: korean index 뭉치
+    '''
+
+    model.eval()
+
+    # sign_language = "<sos>" + sign_language + "<eos>"
+    # print(f"sign language: {sign_language}")
+    # 인덱스 파트 (변수명: src_tensor)
+
+    with torch.no_grad():
+
+        hidden, cell = model.encoder(src)
+  
+    trg_indexes = [word_to_index['s']]
+
+    for i in range(max_len):
+        # trg_tensor = torch.LongTensor([trg_indexes[-1]]).to(device)
+        trg_tensor = torch.tensor([trg_indexes[-1]],dtype=torch.long).to(device)
+        # print(trg_tensor)
+        with torch.no_grad():
+            output, hidden, cell = model.decoder(trg_tensor, hidden, cell)
+
+        pred_token = output.argmax(1).item()
+        trg_indexes.append(pred_token) # 출력 문장에 더하기
+
+        # # <eos>를 만나는 순간 끝
+        # if pred_token == trg_field.vocab.stoi[trg_field.eos_token]:
+        #     break
+
+        # 각 출력 단어 인덱스를 실제 단어로 변환
+        # trg_tokens = [trg_field.vocab.itos[i] for i in trg_indexes]
+        # trg_tokens = [word_to_index[i] for i in trg_indexes]
+  
+  trg_tokens = [list(word_to_index)[i] for i in trg_indexes]
+
+
+    # trg_tokens = [key for key, value in word_to_index.items() if value == i]
+
+
+    # 첫 번째 <sos>는 제외하고 출력 문장 반환
+  return trg_tokens[1:]
+
+def BLEU_Evaluate(model,dataloader,criterion, word_to_index,OUTPUT_DIM , device, max_len = 12):
+    '''
+    src: 번역하고자 하는 keypoint
+    word_to_index: korean index 뭉치
+    '''
+    chencherry = bleu.SmoothingFunction()
+    model.eval()
+    epoch_loss = 0
+    for _,(input, target) in enumerate(dataloader): 
+        BLEU = 0
+        src = input
+        trg = target
+
+        if torch.cuda.is_available():
+            model.cuda()
+            src = src.cuda().float()
+            src2 = src
+            trg = trg.cuda()
+            trg2 = trg
+
+        with torch.no_grad(): # evaluation
+            
+            hidden, cell = model.encoder(src)
+            output = model(src,trg,0) # evaluate
+            output = output[1:].view(-1,OUTPUT_DIM) # evaluate
+            trg = torch.transpose(trg,0,1) # evaluate
+            trg = trg[1:].contiguous().view(-1) # evaluate
+
+            loss = criterion(output,trg) # evaluate
+            epoch_loss += loss.item() # evaluate
+        
+        for input_data,target in zip(src,trg2):
+            input_data = torch.unsqueeze(input_data, 0)
+            print(target[1])
+            ref = list(word_to_index)[target[1]]
+            
+            candidate = ' '.join(translate_SL(input_data, word_to_index, model, device))
+            reg = re.sub('[sf]','',ref)
+            # print('candidate',candidate)
+            # print('reg',reg)
+            BLEU += bleu.sentence_bleu(ref.split(), candidate.split(), weights = (0.5, 0.5), smoothing_function=chencherry.method4, auto_reweigh=False)
+
+
+    # 첫 번째 <sos>는 제외하고 출력 문장 반환
+    return BLEU / len(dataloader)
 
 def epoch_time(start_time, end_time):
     elapsed_time = end_time - start_time
