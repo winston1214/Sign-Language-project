@@ -42,7 +42,8 @@ $ sudo apt-get install libyaml-dev
 
 ## Setting(Alphapose)
 ```
-$ cd Alphapose
+$ git clone https://github.com/winston1214/Sign-Langugage-project.git && cd Sign-Langugage-project
+$ cd Alphapose-json
 $ python setup.py build develop
 ```
 
@@ -59,6 +60,21 @@ $ python frame_split_colab.py --source ${video_path} --output ${save_img_path}
 $ cd pytorch-openpose
 $ python demo_new_open_json_new.py --source %{input_path} --save_dir ${save path}
 ```
+
+## Train
+
+```
+$ python train.py --X_path ${X_train.pickle path} --save_path ${model save directory} \
+--pt_name ${save pt model name} --model ${LSTM or GRU} --batch ${BATCH SIZE}
+
+## Example
+
+$ python train.py --X_path /sign_data/ --save_path pt_file/ \
+--pt_name model1.pt --model GRU --batch 128 --epochs 100 --dropout 0.5
+```
+- X_train.pickle : For convenience, we stored and used the values extracted from the keypoint in **pickle file format**.
+  - (shape : [video_len, max_frame_len, keypoint_len] # [7129, 376, 246] )
+
 
 ## Extract KeyPoint
 <img src='https://github.com/winston1214/Sign-Langugage-project/blob/master/picture/OpenPose_sample.gif?raw=true'></img>
