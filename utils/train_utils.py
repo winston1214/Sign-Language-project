@@ -114,7 +114,7 @@ def translate_SL(src, word_to_index, model, device, max_len = 81):
         hidden, cell = model.encoder(src)
   
     trg_indexes = [word_to_index['s']]
-
+    end_index = word_to_index['t']
     for _ in range(max_len):
         # trg_tensor = torch.LongTensor([trg_indexes[-1]]).to(device)
         trg_tensor = torch.tensor([trg_indexes[-1]],dtype=torch.long).to(device)
@@ -126,8 +126,8 @@ def translate_SL(src, word_to_index, model, device, max_len = 81):
         trg_indexes.append(pred_token) # 출력 문장에 더하기
 
         # # <eos>를 만나는 순간 끝
-        # if pred_token == trg_field.vocab.stoi[trg_field.eos_token]:
-        #     break
+        if pred_token == end_index:
+            break
 
         # 각 출력 단어 인덱스를 실제 단어로 변환
         # trg_tokens = [trg_field.vocab.itos[i] for i in trg_indexes]
@@ -175,7 +175,7 @@ def BLEU_Evaluate(model,dataloader,criterion, word_to_index,OUTPUT_DIM , device,
         
         for input_data,target in zip(src,trg2):
             input_data = torch.unsqueeze(input_data, 0)
-            print(target[1])
+
             ref = list(word_to_index)[target[1]]
             
             candidate = ' '.join(translate_SL(input_data, word_to_index, model, device,max_len))
@@ -209,7 +209,7 @@ def BLEU_Evaluate_test(model,dataloader, word_to_index, device, max_len = 81):
         
         for input_data,target in zip(src,trg):
             input_data = torch.unsqueeze(input_data, 0)
-            print(target[1])
+
             ref = list(word_to_index)[target[1]]
             
             candidate = ' '.join(translate_SL(input_data, word_to_index, model, device,max_len))
