@@ -58,15 +58,16 @@ def main_test(opt):
         enc = LSTM_Encoder(input_size, HID_DIM, N_LAYERS)
         dec = LSTM_Decoder(OUTPUT_DIM, emb_dim, HID_DIM, N_LAYERS, DEC_DROPOUT)
         model = LSTM_Seq2Seq(enc, dec, device).to(device)
-        model.load_state_dict(torch.load(opt.pt))
+
     if opt.model == 'GRU':
         enc = GRU_AT_Encoder(input_size, HID_DIM, N_LAYERS)
         att = Attention(HID_DIM)
         dec = GRU_AT_Decoder(OUTPUT_DIM, emb_dim, HID_DIM, N_LAYERS, att, DEC_DROPOUT)
         model = GRU_AT_Seq2Seq(enc,dec,device).to(device)
-        model.load_state_dict(torch.load(opt.pt))
+
 
     model.apply(init_weights)
+    model.load_state_dict(torch.load(opt.pt))
 
 
     ## Test
