@@ -28,8 +28,8 @@ def main_test(opt):
     with gzip.open(opt.X_path + 'X_test.pickle','rb') as f:
         X_data = pickle.load(f)
     excel_name = opt.csv_name # 'C:/Users/winst/Downloads/menmen/train_target.xlsx'
-    word_to_index, max_len, vocab,decoder_input = target_preprocessing(excel_name,'test')
-    _, _, train_vocab ,_ = target_preprocessing(excel_name,'train')
+    _, max_len, vocab,decoder_input = target_preprocessing(excel_name,'test')
+    word_to_index, _, train_vocab ,_ = target_preprocessing(excel_name,'train')
 
     ## Setting of Hyperparameter
     HID_DIM = opt.hid_dim # 512
