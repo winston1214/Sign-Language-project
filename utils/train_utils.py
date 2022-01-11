@@ -118,7 +118,7 @@ def translate_SL(src, word_to_index, model, device, max_len = 81):
     for _ in range(max_len):
         # trg_tensor = torch.LongTensor([trg_indexes[-1]]).to(device)
         trg_tensor = torch.tensor([trg_indexes[-1]],dtype=torch.long).to(device)
-        # print(trg_tensor)
+        print(trg_tensor)
         with torch.no_grad():
             output, hidden, cell = model.decoder(trg_tensor, hidden, cell)
 
