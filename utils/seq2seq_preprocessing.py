@@ -46,7 +46,8 @@ def target_preprocessing(excel_name,mode='train'):
             result.append(word)
             if word not in vocab:
                 vocab[word] = 0
-            vocab[word] += 1 # 단어와 빈도수 집합
+            else:
+                vocab[word] += 1 # 단어와 빈도수 집합
         preprocessed_sentences.append(result) 
     vocab_sorted = sorted(vocab.items(), key = lambda x:x[1], reverse = True)
 

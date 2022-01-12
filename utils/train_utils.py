@@ -193,15 +193,13 @@ def BLEU_Evaluate(model,dataloader,criterion, word_to_index,OUTPUT_DIM , device,
             
             candidate = ' '.join(translate_SL(input_data, word_to_index, model, device,max_len))
             ref = re.sub('[sf]','',ref)
-            if len(candidate.split()) == 0:
-                zero_pred += 1
-            else:
-                BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),weights = [1,0,0,0])
-                acc += sum(x == y for x, y in zip(ref.split(), candidate.split())) / len(candidate.split())
+
+            BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),weights = [1,0,0,0])
+            acc += sum(x == y for x, y in zip(ref.split(), candidate.split())) / len(candidate.split())
 
 
     # 첫 번째 <sos>는 제외하고 출력 문장 반환
-    return epoch_loss / len(dataloader), BLEU / (len(dataloader)-zero_pred), acc/(len(dataloader)-zero_pred)
+    return epoch_loss / len(dataloader), BLEU / (len(dataloader)), acc/len(dataloader)
 
 
 def BLEU_Evaluate_test(model,dataloader, word_to_index, word_to_index_test, device , max_len = 81):
@@ -245,7 +243,7 @@ def BLEU_Evaluate_test(model,dataloader, word_to_index, word_to_index_test, devi
 
 
             BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),weights = [1,0,0,0])
-            acc += scores.accuracy(ref.split(),candidate.split())
+            acc += sum(x == y for x, y in zip(ref.split(), candidate.split())) / len(candidate.split())
 
 
     return BLEU / len(dataloader), acc/len(dataloader)
