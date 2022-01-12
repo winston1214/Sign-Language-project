@@ -82,7 +82,7 @@ def main_train(opt):
     train_loss_ls = []
     val_loss_ls = []
     acc_ls = []
-    epoch_ls = [i for i in N_EPOCHS]
+    epoch_ls = [i for i in range(N_EPOCHS)]
     
     for epoch in tqdm(range(N_EPOCHS)):
         start_time = time.time()
