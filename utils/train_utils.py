@@ -219,6 +219,8 @@ def BLEU_Evaluate_test(model,dataloader, word_to_index, device, max_len = 81):
             
             candidate = ' '.join(translate_SL(input_data, word_to_index, model, device,max_len))
             ref = re.sub('[sf]','',ref)
+            print(candidate)
+            print(ref)
 
             BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),  auto_reweigh=True)
             acc = sum(x == y for x, y in zip(ref, candidate)) / len(candidate)
