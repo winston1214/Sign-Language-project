@@ -155,6 +155,7 @@ def BLEU_Evaluate(model,dataloader,criterion, word_to_index,OUTPUT_DIM , device,
     model.eval()
     epoch_loss = 0
     BLEU = 0
+    acc = 0
     for _,(input, target) in enumerate(dataloader): 
         
         src = input
@@ -194,13 +195,13 @@ def BLEU_Evaluate(model,dataloader,criterion, word_to_index,OUTPUT_DIM , device,
             ref = re.sub('[sf]','',ref)
 
             BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),auto_reweigh=True)
-            acc = sum(x == y for x, y in zip(ref, candidate)) / len(candidate)
+            acc += sum(x == y for x, y in zip(ref, candidate)) / len(candidate)
 
 
     # 첫 번째 <sos>는 제외하고 출력 문장 반환
     return epoch_loss / len(dataloader), BLEU / len(dataloader), acc/len(dataloader)
 
-def BLEU_Evaluate_test(model,dataloader, word_to_index, device, max_len = 81):
+def BLEU_Evaluate_test(model,dataloader, word_to_index, word_to_index_test, device , max_len = 81):
     '''
     src: 번역하고자 하는 keypoint
     word_to_index: korean index 뭉치
@@ -208,6 +209,7 @@ def BLEU_Evaluate_test(model,dataloader, word_to_index, device, max_len = 81):
     model.eval()
 
     BLEU = 0
+    acc = 0
     for _,(input, target) in enumerate(dataloader): 
         
         src = input
@@ -220,25 +222,26 @@ def BLEU_Evaluate_test(model,dataloader, word_to_index, device, max_len = 81):
             trg = trg.cuda()
 
         
-        for input_data,target in zip(src,trg):
+        for input_data,target in zip(src,trg): # 배치
             input_data = torch.unsqueeze(input_data, 0)
 
             ref = []
             for t in target:
-                if t == 1:
+
+                if t == 1: # f가 나올때까지
                     break
                 else:
-                    ref.append(list(word_to_index)[t])
-            ref = ' '.join(ref)
+                    ref.append(list(word_to_index_test)[t])
+            ref = ' '.join(ref) # 정답
             
             candidate = ' '.join(translate_SL(input_data, word_to_index, model, device,max_len))
+            
             ref = re.sub('[sf]','',ref)
 
-
             BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),  auto_reweigh=True)
-            acc = sum(x == y for x, y in zip(ref, candidate)) / len(candidate)
+            acc += sum(x == y for x, y in zip(ref, candidate)) / len(candidate)
 
-    # 첫 번째 <sos>는 제외하고 출력 문장 반환
+
     return BLEU / len(dataloader), acc/len(dataloader)
 
 def epoch_time(start_time, end_time):

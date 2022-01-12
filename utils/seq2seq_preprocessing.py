@@ -28,7 +28,7 @@ def target_preprocessing(excel_name,mode='train'):
     elif mode == 'test':
         target = target[(target['num'] <= 43177) & (target['num'] >= 42303)]
     
-    target = target['target'].map(lambda x: re.sub('[(-,)=.#/?:$}]','', x)) # 부가적인 전처리
+    target = target['target'].map(lambda x: re.sub('[(-,)=.#/?:!$}]','', x)) # 부가적인 전처리
     target = target.apply(lambda x : 's '+ x + ' f')
 
     temp = target.values.tolist() # 단어 집합 구축
@@ -43,10 +43,10 @@ def target_preprocessing(excel_name,mode='train'):
         result = []
 
         for word in tokenized_sentence:
-          result.append(word)
-          if word not in vocab:
-            vocab[word] = 0
-          vocab[word] += 1 # 단어와 빈도수 집합
+            result.append(word)
+            if word not in vocab:
+                vocab[word] = 0
+            vocab[word] += 1 # 단어와 빈도수 집합
         preprocessed_sentences.append(result) 
     vocab_sorted = sorted(vocab.items(), key = lambda x:x[1], reverse = True)
 
@@ -68,7 +68,7 @@ def target_preprocessing(excel_name,mode='train'):
     decoder_input = pad_sequences(encoded_sentences, maxlen=max_tar_len, padding='post')
 
     return word_to_index,max_tar_len,vocab,decoder_input
-if __name__ == '__main__':
-    vocab,decoder_input = target_preprocessing('C:/Users/winst/Downloads/menmen/train_target.xlsx')
-    print('vocab',vocab)
-    print('decoder_input',decoder_input.shape)
+# if __name__ == '__main__':
+    # word_to_index,max_tar_len,vocab,decoder_input = target_preprocessing('train_target.csv')
+#     print('vocab',vocab)
+#     print('decoder_input',decoder_input.shape)
