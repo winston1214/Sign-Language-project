@@ -5,8 +5,10 @@ import torch.nn as nn
 import numpy as np
 import random
 import nltk.translate.bleu_score as bleu
+from sklearn.metrics import accuracy_score
 import re
-
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 torch.manual_seed(0)
 torch.cuda.manual_seed(0)
@@ -147,11 +149,12 @@ def BLEU_Evaluate(model,dataloader,criterion, word_to_index,OUTPUT_DIM , device,
     src: 번역하고자 하는 keypoint
     word_to_index: korean index 뭉치
     '''
-    chencherry = bleu.SmoothingFunction()
+
     model.eval()
     epoch_loss = 0
+    BLEU = 0
     for _,(input, target) in enumerate(dataloader): 
-        BLEU = 0
+        
         src = input
         trg = target
 
@@ -181,22 +184,23 @@ def BLEU_Evaluate(model,dataloader,criterion, word_to_index,OUTPUT_DIM , device,
             candidate = ' '.join(translate_SL(input_data, word_to_index, model, device,max_len))
             ref = re.sub('[sf]','',ref)
 
-            BLEU += bleu.sentence_bleu(ref.split(), candidate.split(), weights = (0.5, 0.5), smoothing_function=chencherry.method4, auto_reweigh=False)
+            BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),auto_reweigh=True)
+            acc = accuracy_score([ref.split()],[candidate.split()])
 
 
     # 첫 번째 <sos>는 제외하고 출력 문장 반환
-    return epoch_loss / len(dataloader), BLEU / len(dataloader)
+    return epoch_loss / len(dataloader), BLEU / len(dataloader), acc/len(dataloader)
 
 def BLEU_Evaluate_test(model,dataloader, word_to_index, device, max_len = 81):
     '''
     src: 번역하고자 하는 keypoint
     word_to_index: korean index 뭉치
     '''
-    chencherry = bleu.SmoothingFunction()
     model.eval()
-    epoch_loss = 0
+
+    BLEU = 0
     for _,(input, target) in enumerate(dataloader): 
-        BLEU = 0
+        
         src = input
         trg = target
 
@@ -215,14 +219,20 @@ def BLEU_Evaluate_test(model,dataloader, word_to_index, device, max_len = 81):
             candidate = ' '.join(translate_SL(input_data, word_to_index, model, device,max_len))
             ref = re.sub('[sf]','',ref)
 
-            BLEU += bleu.sentence_bleu(ref.split(), candidate.split(), weights = (0.5, 0.5), smoothing_function=chencherry.method4, auto_reweigh=False)
-
+            BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),  auto_reweigh=False)
+            acc = accuracy_score([ref.split()],[candidate.split()])
 
     # 첫 번째 <sos>는 제외하고 출력 문장 반환
-    return epoch_loss / len(dataloader), BLEU / len(dataloader)
+    return BLEU / len(dataloader), acc/len(dataloader)
 
 def epoch_time(start_time, end_time):
     elapsed_time = end_time - start_time
     elapsed_mins = int(elapsed_time / 60)
     elapsed_secs = int(elapsed_time - (elapsed_mins * 60))
     return elapsed_mins, elapsed_secs
+
+def make_plot(epoch,score,title,path):
+    plt.figure(figsize=  (12,8))
+    sns.lineplot(x = epoch,y = score)
+    plt.title(title,fontsize = 15)
+    plt.savefig(f'{path}{title}.png')

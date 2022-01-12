@@ -1,7 +1,7 @@
 from model.seq2seq_lstm import LSTM_Encoder,LSTM_Decoder,LSTM_Seq2Seq
 from model.seq2seq_gru_attention import GRU_AT_Decoder, GRU_AT_Encoder, GRU_AT_Seq2Seq, Attention
 from utils.seq2seq_preprocessing import  target_preprocessing
-from utils.train_utils import train,BLEU_Evaluate,epoch_time,init_weights
+from utils.train_utils import train,BLEU_Evaluate,epoch_time,init_weights,make_plot
 import torch
 import torch.nn as nn
 import torch.utils.data as D
@@ -78,13 +78,22 @@ def main_train(opt):
     ## Train
 
     best_valid_loss = float('inf')
-
-
+    BLEU_ls = []
+    train_loss_ls = []
+    val_loss_ls = []
+    acc_ls = []
+    epoch_ls = [i for i in N_EPOCHS]
+    
     for epoch in tqdm(range(N_EPOCHS)):
         start_time = time.time()
 
         train_loss = train(model, train_dataloader, OUTPUT_DIM, optimizer, criterion, CLIP)
-        valid_loss, BLEU = BLEU_Evaluate(model,val_dataloader,criterion, word_to_index, OUTPUT_DIM, device,max_len)
+        valid_loss, BLEU,acc = BLEU_Evaluate(model,val_dataloader,criterion, word_to_index, OUTPUT_DIM, device,max_len)
+
+        train_loss_ls.append(train_loss)
+        val_loss_ls.append(valid_loss)
+        BLEU_ls.append(BLEU)
+        acc_ls.append(acc)
         # valid_loss = evaluate(model, val_dataloader, OUTPUT_DIM,criterion)
  
         end_time = time.time()
@@ -96,7 +105,13 @@ def main_train(opt):
         
         print(f'Epoch: {epoch + 1:02} | Time: {epoch_mins}m {epoch_secs}s')
         print(f'\t Train Loss: {train_loss:.3f} | Train PPL: {math.exp(train_loss):7.3f}')
-        print(f'\t Val Loss: {valid_loss:.3f} | Val PPL: {math.exp(valid_loss):7.3f} | Val BLEU: {BLEU: .3f}')
+        print(f'\t Val Loss: {valid_loss:.3f} | Val PPL: {math.exp(valid_loss):7.3f}')
+        print(f'\t Val BLEU : {BLEU : .3f} | Val Accuracy : {acc : .3f}')
+    make_plot(epoch_ls,train_loss_ls,'Train loss',opt.save_path)
+    make_plot(epoch_ls,val_loss_ls,'Valid loss',opt.save_path)
+    make_plot(epoch_ls,BLEU_ls,'BLEU',opt.save_path)
+    make_plot(epoch_ls,acc_ls,'Accuracy',opt.save_path)
+    
 
 
 

@@ -77,13 +77,13 @@ def main_test(opt):
     start_time = time.time()
 
 
-    BLEU = BLEU_Evaluate_test(model,test_dataloader, word_to_index, device, max_len)
+    BLEU,acc = BLEU_Evaluate_test(model,test_dataloader, word_to_index, device, max_len)
     # valid_loss = evaluate(model, val_dataloader, OUTPUT_DIM,criterion)
 
     end_time = time.time()
     print(end_time - start_time)
 
-    print(f'TEST BLEU : {BLEU : .3f}')
+    print(f'TEST BLEU : {BLEU : .3f} | TEST ACC : {acc : .3f}')
 
 
 
