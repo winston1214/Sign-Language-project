@@ -151,7 +151,7 @@ def BLEU_Evaluate(model,dataloader,criterion, word_to_index,OUTPUT_DIM , device,
     src: 번역하고자 하는 keypoint
     word_to_index: korean index 뭉치
     '''
-
+    zero_pred = 0
     model.eval()
     epoch_loss = 0
     BLEU = 0
@@ -193,13 +193,15 @@ def BLEU_Evaluate(model,dataloader,criterion, word_to_index,OUTPUT_DIM , device,
             
             candidate = ' '.join(translate_SL(input_data, word_to_index, model, device,max_len))
             ref = re.sub('[sf]','',ref)
-            
-            BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),weights = [1,0,0,0])
-            acc += scores.accuracy(ref.split(),candidate.split())
+            if len(candidate.split()) == 0:
+                zero_pred += 1
+            else:
+                BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),weights = [1,0,0,0])
+                acc += sum(x == y for x, y in zip(ref.split(), candidate.split())) / len(candidate.split())
 
 
     # 첫 번째 <sos>는 제외하고 출력 문장 반환
-    return epoch_loss / len(dataloader), BLEU / len(dataloader), acc/len(dataloader)
+    return epoch_loss / len(dataloader), BLEU / (len(dataloader)-zero_pred), acc/(len(dataloader)-zero_pred)
 
 
 def BLEU_Evaluate_test(model,dataloader, word_to_index, word_to_index_test, device , max_len = 81):
