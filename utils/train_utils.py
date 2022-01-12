@@ -193,8 +193,8 @@ def BLEU_Evaluate(model,dataloader,criterion, word_to_index,OUTPUT_DIM , device,
             
             candidate = ' '.join(translate_SL(input_data, word_to_index, model, device,max_len))
             ref = re.sub('[sf]','',ref)
-
-            BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),auto_reweigh=True)
+            
+            BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),weights = [1,0,0,0])
             acc += scores.accuracy(ref.split(),candidate.split())
 
 
@@ -242,7 +242,7 @@ def BLEU_Evaluate_test(model,dataloader, word_to_index, word_to_index_test, devi
             ref = re.sub('[sf]','',ref)
 
 
-            BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),  auto_reweigh=True)
+            BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),weights = [1,0,0,0])
             acc += scores.accuracy(ref.split(),candidate.split())
 
 
