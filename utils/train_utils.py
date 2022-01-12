@@ -194,8 +194,9 @@ def BLEU_Evaluate(model,dataloader,criterion, word_to_index,OUTPUT_DIM , device,
             candidate = ' '.join(translate_SL(input_data, word_to_index, model, device,max_len))
             ref = re.sub('[sf]','',ref)
 
-            BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),auto_reweigh=True)
-            acc += sum(x == y for x, y in zip(ref, candidate)) / len(candidate)
+            BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),weights=[1,0,0,0])
+
+            acc += sum(x == y for x, y in zip(ref.split(), candidate.split()))/len(ref.split()) # 맞음
 
 
     # 첫 번째 <sos>는 제외하고 출력 문장 반환
@@ -237,9 +238,8 @@ def BLEU_Evaluate_test(model,dataloader, word_to_index, word_to_index_test, devi
             candidate = ' '.join(translate_SL(input_data, word_to_index, model, device,max_len))
             
             ref = re.sub('[sf]','',ref)
-
-            BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),  auto_reweigh=True)
-            acc += sum(x == y for x, y in zip(ref, candidate)) / len(candidate)
+            BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),weights=[1,0,0,0])
+            acc += sum(x == y for x, y in zip(ref.split(), candidate.split()))/len(ref.split()) # 맞음
 
 
     return BLEU / len(dataloader), acc/len(dataloader)
