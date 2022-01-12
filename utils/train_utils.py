@@ -9,6 +9,8 @@ from sklearn.metrics import accuracy_score
 import re
 import seaborn as sns
 import matplotlib.pyplot as plt
+import warnings
+warnings.filterwarnings('ignore')
 
 torch.manual_seed(0)
 torch.cuda.manual_seed(0)
@@ -120,7 +122,6 @@ def translate_SL(src, word_to_index, model, device, max_len = 81):
     for _ in range(max_len):
         # trg_tensor = torch.LongTensor([trg_indexes[-1]]).to(device)
         trg_tensor = torch.tensor([trg_indexes[-1]],dtype=torch.long).to(device)
-        print(trg_tensor)
         with torch.no_grad():
             output, hidden, cell = model.decoder(trg_tensor, hidden, cell)
 
@@ -185,7 +186,7 @@ def BLEU_Evaluate(model,dataloader,criterion, word_to_index,OUTPUT_DIM , device,
             ref = re.sub('[sf]','',ref)
 
             BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),auto_reweigh=True)
-            acc = accuracy_score([ref.split()],[candidate.split()])
+            acc = sum(x == y for x, y in zip(ref, candidate)) / len(candidate)
 
 
     # 첫 번째 <sos>는 제외하고 출력 문장 반환
@@ -219,8 +220,8 @@ def BLEU_Evaluate_test(model,dataloader, word_to_index, device, max_len = 81):
             candidate = ' '.join(translate_SL(input_data, word_to_index, model, device,max_len))
             ref = re.sub('[sf]','',ref)
 
-            BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),  auto_reweigh=False)
-            acc = accuracy_score([ref.split()],[candidate.split()])
+            BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),  auto_reweigh=True)
+            acc = sum(x == y for x, y in zip(ref, candidate)) / len(candidate)
 
     # 첫 번째 <sos>는 제외하고 출력 문장 반환
     return BLEU / len(dataloader), acc/len(dataloader)
