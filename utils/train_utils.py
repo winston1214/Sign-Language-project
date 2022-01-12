@@ -5,7 +5,7 @@ import torch.nn as nn
 import numpy as np
 import random
 import nltk.translate.bleu_score as bleu
-from sklearn.metrics import accuracy_score
+from nltk.metrics import scores
 import re
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -194,13 +194,13 @@ def BLEU_Evaluate(model,dataloader,criterion, word_to_index,OUTPUT_DIM , device,
             candidate = ' '.join(translate_SL(input_data, word_to_index, model, device,max_len))
             ref = re.sub('[sf]','',ref)
 
-            BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),weights=[1,0,0,0])
-
-            acc += sum(x == y for x, y in zip(ref.split(), candidate.split()))/len(ref.split()) # 맞음
+            BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),auto_reweigh=True)
+            acc += scores.accuracy(ref.split(),candidate.split())
 
 
     # 첫 번째 <sos>는 제외하고 출력 문장 반환
     return epoch_loss / len(dataloader), BLEU / len(dataloader), acc/len(dataloader)
+
 
 def BLEU_Evaluate_test(model,dataloader, word_to_index, word_to_index_test, device , max_len = 81):
     '''
@@ -233,13 +233,17 @@ def BLEU_Evaluate_test(model,dataloader, word_to_index, word_to_index_test, devi
                     break
                 else:
                     ref.append(list(word_to_index_test)[t])
+
             ref = ' '.join(ref) # 정답
-            
+
+
             candidate = ' '.join(translate_SL(input_data, word_to_index, model, device,max_len))
             
             ref = re.sub('[sf]','',ref)
-            BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),weights=[1,0,0,0])
-            acc += sum(x == y for x, y in zip(ref.split(), candidate.split()))/len(ref.split()) # 맞음
+
+
+            BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),  auto_reweigh=True)
+            acc += scores.accuracy(ref.split(),candidate.split())
 
 
     return BLEU / len(dataloader), acc/len(dataloader)
