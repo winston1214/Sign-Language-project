@@ -126,11 +126,12 @@ def translate_SL(src, word_to_index, model, device, max_len = 81):
             output, hidden, cell = model.decoder(trg_tensor, hidden, cell)
 
         pred_token = output.argmax(1).item()
-        trg_indexes.append(pred_token) # 출력 문장에 더하기
-
         # # <eos>를 만나는 순간 끝
         if pred_token == end_index:
             break
+        trg_indexes.append(pred_token) # 출력 문장에 더하기
+
+
 
         # 각 출력 단어 인덱스를 실제 단어로 변환
         # trg_tokens = [trg_field.vocab.itos[i] for i in trg_indexes]
@@ -180,7 +181,14 @@ def BLEU_Evaluate(model,dataloader,criterion, word_to_index,OUTPUT_DIM , device,
         for input_data,target in zip(src,trg2):
             input_data = torch.unsqueeze(input_data, 0)
 
-            ref = list(word_to_index)[target[1]]
+            ref = []
+            for t in target:
+                if t == 1:
+                    break
+                else:
+                    ref.append(list(word_to_index)[t])
+            ref = ' '.join(ref)
+                
             
             candidate = ' '.join(translate_SL(input_data, word_to_index, model, device,max_len))
             ref = re.sub('[sf]','',ref)
@@ -215,12 +223,17 @@ def BLEU_Evaluate_test(model,dataloader, word_to_index, device, max_len = 81):
         for input_data,target in zip(src,trg):
             input_data = torch.unsqueeze(input_data, 0)
 
-            ref = list(word_to_index)[target[1]]
+            ref = []
+            for t in target:
+                if t == 1:
+                    break
+                else:
+                    ref.append(list(word_to_index)[t])
+            ref = ' '.join(ref)
             
             candidate = ' '.join(translate_SL(input_data, word_to_index, model, device,max_len))
             ref = re.sub('[sf]','',ref)
-            print(candidate)
-            print(ref)
+
 
             BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),  auto_reweigh=True)
             acc = sum(x == y for x, y in zip(ref, candidate)) / len(candidate)
