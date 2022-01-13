@@ -147,6 +147,53 @@ def translate_SL(src, word_to_index, model, device, max_len = 81):
     # 첫 번째 <sos>는 제외하고 출력 문장 반환
     return trg_tokens[1:]
 
+def translate_SL_ATT(src, word_to_index, model, device, max_len = 81):
+    '''
+    src: 번역하고자 하는 keypoint
+    word_to_index: korean index 뭉치
+    '''
+
+    model.eval()
+
+  # sign_language = "<sos>" + sign_language + "<eos>"
+  # print(f"sign language: {sign_language}")
+  # 인덱스 파트 (변수명: src_tensor)
+
+    with torch.no_grad():
+
+        encoder_outputs, hidden = model.encoder(src)
+  
+    trg_indexes = [word_to_index['s']]
+    end_index = word_to_index['f']
+
+
+    for i in range(max_len):
+        # trg_tensor = torch.LongTensor([trg_indexes[-1]]).to(device)
+        trg_tensor = torch.tensor([trg_indexes[-1]],dtype=torch.long).to(device)
+
+        with torch.no_grad():
+            output, hidden= model.decoder(trg_tensor, hidden, encoder_outputs)
+
+        pred_token = output.argmax(1).item()
+            # # <eos>를 만나는 순간 끝
+        if pred_token == end_index:
+            break
+
+        trg_indexes.append(pred_token) # 출력 문장에 더하기
+
+
+
+
+    # 각 출력 단어 인덱스를 실제 단어로 변환
+    # trg_tokens = [trg_field.vocab.itos[i] for i in trg_indexes]
+    # trg_tokens = [word_to_index[i] for i in trg_indexes]
+    trg_tokens = [list(word_to_index)[i] for i in trg_indexes]
+    # trg_tokens = [key for key, value in word_to_index.items() if value == i]
+
+
+    # 첫 번째 <sos>는 제외하고 출력 문장 반환
+    return trg_tokens[1:]
+
 def BLEU_Evaluate(model,dataloader,criterion, word_to_index,OUTPUT_DIM , device, max_len = 81):
     '''
     src: 번역하고자 하는 keypoint
@@ -194,6 +241,7 @@ def BLEU_Evaluate(model,dataloader,criterion, word_to_index,OUTPUT_DIM , device,
             
             candidate = ' '.join(translate_SL(input_data, word_to_index, model, device,max_len))
             ref = re.sub('[sf]','',ref)
+            ref = ref.strip()
             if len(candidate.split()) == 0:
                 zero_pred += 1
             else:
@@ -249,6 +297,7 @@ def BLEU_Evaluate_test(model,dataloader, word_to_index, word_to_index_test, devi
             candidate = ' '.join(translate_SL(input_data, word_to_index, model, device,max_len))
             
             ref = re.sub('[sf]','',ref)
+            ref = ref.strip()
 
             answer.append(ref)
             predict.append(candidate)
