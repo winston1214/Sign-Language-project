@@ -68,6 +68,7 @@ def train(model, dataloader, OUTPUT_DIM,optimizer, criterion, clip):
     return epoch_loss / len(dataloader)
 
 
+
 def evaluate(model, dataloader,OUTPUT_DIM, criterion):
     
     model.eval()
@@ -218,6 +219,7 @@ def BLEU_Evaluate_test(model,dataloader, word_to_index, word_to_index_test, devi
     cnt = 0
     answer = []
     predict = []
+    zero_pred = 0
     for _,(input, target) in enumerate(dataloader): 
         
         src = input
@@ -251,11 +253,14 @@ def BLEU_Evaluate_test(model,dataloader, word_to_index, word_to_index_test, devi
             answer.append(ref)
             predict.append(candidate)
 
-            BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),weights = [1,0,0,0])
-            acc += sum(x == y for x, y in zip(ref.split(), candidate.split())) / len(candidate.split())
+            if len(candidate.split()) == 0:
+                zero_pred += 1
+            else:
+                BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),weights = [1,0,0,0])
+                acc += sum(x == y for x, y in zip(ref.split(), candidate.split())) / len(candidate.split())
+        
 
-
-    return BLEU / cnt, acc/cnt,answer,predict
+    return BLEU / (cnt-zero_pred), acc/(cnt-zero_pred),answer,predict
 
 def epoch_time(start_time, end_time):
     elapsed_time = end_time - start_time
