@@ -249,11 +249,11 @@ def BLEU_Evaluate(model,dataloader,criterion, word_to_index,OUTPUT_DIM , device,
             else:
                 BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),weights = [1,0,0,0])
                 acc += sum(x == y for x, y in zip(ref.split(), candidate.split())) / len(candidate.split())
-            if cnt == zero_pred:
-                BLEU , acc = 0,0
-            else:
-                BLEU = BLEU / (cnt - zero_pred)
-                acc = acc/(cnt - zero_pred)
+    if cnt == zero_pred:
+        BLEU , acc = 0,0
+    else:
+        BLEU = BLEU / (cnt - zero_pred)
+        acc = acc/(cnt - zero_pred)
     print('zero : ',zero_pred)
     return epoch_loss / len(dataloader), BLEU, acc
 
