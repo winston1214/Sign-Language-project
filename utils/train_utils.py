@@ -204,7 +204,7 @@ def BLEU_Evaluate(model,dataloader,criterion, word_to_index,OUTPUT_DIM , device,
             else:
                 BLEU = BLEU / (cnt - zero_pred)
                 acc = acc/(cnt - zero_pred)
-    # 첫 번째 <sos>는 제외하고 출력 문장 반환
+    print('zero : ',zero_pred)
     return epoch_loss / len(dataloader), BLEU, acc
 
 
@@ -259,7 +259,7 @@ def BLEU_Evaluate_test(model,dataloader, word_to_index, word_to_index_test, devi
                 BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),weights = [1,0,0,0])
                 acc += sum(x == y for x, y in zip(ref.split(), candidate.split())) / len(candidate.split())
         
-
+    print('zero : ',zero_pred)
     return BLEU / (cnt-zero_pred), acc/(cnt-zero_pred),answer,predict
 
 def epoch_time(start_time, end_time):

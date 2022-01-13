@@ -40,6 +40,7 @@ def main_train(opt):
     BATCH_SIZE = opt.batch # 32
     N_EPOCHS = opt.epochs # 50
     CLIP = 1
+    learning_rate = opt.lr # 0.001
     model_save_path = opt.save_path # 'pt_file/'
     save_model_name = opt.pt_name # 'model1.pt'
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -52,8 +53,8 @@ def main_train(opt):
 
     dataset = D.TensorDataset(X_train,decoder_input)
     train_dataset, val_dataset = D.random_split(dataset, [len(dataset) - int(len(dataset) * 0.2), int(len(dataset) * 0.2)]) # 8:2 split
-    train_dataloader =  torch.utils.data.DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, drop_last=True)
-    val_dataloader =  torch.utils.data.DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=True, drop_last=True)
+    train_dataloader =  torch.utils.data.DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, drop_last=False)
+    val_dataloader =  torch.utils.data.DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=True, drop_last=False)
     input_size = 246 # keypoint vector 길이
 
 
@@ -71,7 +72,7 @@ def main_train(opt):
     model.apply(init_weights)
 
     ## Loss & Optimizer
-    optimizer = torch.optim.Adam(model.parameters())
+    optimizer = torch.optim.Adam(model.parameters(),lr = learning_rate)
     criterion = nn.CrossEntropyLoss().to(device)
 
 
@@ -123,6 +124,7 @@ if __name__ == '__main__':
     parser.add_argument('--emb_dim',type=int,default=128,help = 'Nuber of embedding demension')
     parser.add_argument('--batch',type=int,default = 32,help='BATCH SIZE')
     parser.add_argument('--epochs',type=int, default = 50, help='EPOCH')
+    parser.add_argument('--lr',type=float,default = 0.001,help='learning rate')
     parser.add_argument('--save_path',type=str,default='pt_file',help='model save path')
     parser.add_argument('--pt_name',type=str,default='model1.pt',help='save model name')
     parser.add_argument('--csv_name',type=str,default='train_target.csv',help='Target Excel name')

@@ -41,7 +41,7 @@ def main_train(opt):
     BATCH_SIZE = opt.batch # 32
     N_EPOCHS = opt.epochs # 50
     CLIP = 1
-    learning_rate = 0.01
+    learning_rate = opt.lr
     model_save_path = opt.save_path # 'pt_file/'
     save_model_name = opt.pt_name # 'model1.pt'
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -127,6 +127,7 @@ if __name__ == '__main__':
     parser.add_argument('--emb_dim',type=int,default=128,help = 'Nuber of embedding demension')
     parser.add_argument('--batch',type=int,default = 32,help='BATCH SIZE')
     parser.add_argument('--epochs',type=int, default = 50, help='EPOCH')
+    parser.add_argument('--lr',type=float,default = 0.001,help='learning rate')
     parser.add_argument('--save_path',type=str,default='pt_file',help='model save path')
     parser.add_argument('--pt_name',type=str,default='model1.pt',help='save model name')
     parser.add_argument('--csv_name',type=str,default='train_target.csv',help='Target Excel name')
