@@ -81,6 +81,8 @@ def main_train(opt):
     ## Train
 
     best_valid_loss = float('inf')
+    best_bleu = 0
+    best_acc = 0
     BLEU_ls = []
     train_loss_ls = []
     val_loss_ls = []
@@ -105,7 +107,13 @@ def main_train(opt):
 
         if valid_loss < best_valid_loss:
             best_valid_loss = valid_loss
-            torch.save(model.state_dict(), f'{model_save_path}{save_model_name}')
+            torch.save(model.state_dict(), f'{model_save_path}loss_{save_model_name}')
+        if BLEU > best_bleu:
+            best_bleu = BLEU
+            torch.save(model.state_dict(),f'{model_save_path}bleu_{save_model_name}')
+        if acc > best_acc:
+            best_acc = acc
+            torch.save(model.state_dict(),f'{model_save_path}acc_{save_model_name}')
         
         print(f'Epoch: {epoch + 1:02} | Time: {epoch_mins}m {epoch_secs}s')
         print(f'\t Train Loss: {train_loss:.3f} | Train PPL: {math.exp(train_loss):7.3f}')
