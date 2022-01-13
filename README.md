@@ -55,10 +55,9 @@ If you don't run in the COLAB environment or the **cuda version is 10.0**, refer
 ```
 $ python frame_split_colab.py --source ${video_path} --output ${save_img_path}
 ```
-**2. Extract KeyPoint(OpenPose)**
+**2. Extract KeyPoint(Alphapose)**
 ```
-$ cd pytorch-openpose
-$ python demo_new_open_json_new.py --source %{input_path} --save_dir ${save path}
+수정예정
 ```
 
 ## Train
@@ -77,4 +76,4 @@ $ python train.py --X_path /sign_data/ --save_path pt_file/ \
 
 
 ## Extract KeyPoint
-<img src='https://github.com/winston1214/Sign-Langugage-project/blob/master/picture/OpenPose_sample.gif?raw=true'></img>
+<img src='https://github.com/winston1214/Sign-Langugage-project/blob/master/picture/alphapose.gif?raw=true'></img>
