@@ -65,7 +65,7 @@ def train(model, dataloader, OUTPUT_DIM,optimizer, criterion, clip):
         
         epoch_loss += loss.item()
         
-    return epoch_loss / len(dataloader)
+    return model,epoch_loss / len(dataloader)
 
 
 
