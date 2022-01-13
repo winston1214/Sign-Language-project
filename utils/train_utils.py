@@ -258,7 +258,7 @@ def BLEU_Evaluate(model,dataloader,criterion, word_to_index,OUTPUT_DIM , device,
     return epoch_loss / len(dataloader), BLEU, acc
 
 
-def BLEU_Evaluate_test(model,dataloader, word_to_index, word_to_index_test, device , max_len = 81):
+def BLEU_Evaluate_test(model,dataloader, word_to_index, word_to_index_test, device , max_len = 81,model_name = 'GRU'):
     '''
     src: 번역하고자 하는 keypoint
     word_to_index: korean index 뭉치
@@ -295,8 +295,10 @@ def BLEU_Evaluate_test(model,dataloader, word_to_index, word_to_index_test, devi
 
             ref = ' '.join(ref) # 정답
 
-
-            candidate = ' '.join(translate_SL(input_data, word_to_index, model, device,max_len))
+            if model_name == 'GRU':
+                candidate = ' '.join(translate_SL_ATT(input_data, word_to_index, model, device,max_len))
+            else:
+                candidate = ' '.join(translate_SL(input_data, word_to_index, model, device,max_len))
             
             ref = re.sub('[sf]','',ref)
             ref = ref.strip()

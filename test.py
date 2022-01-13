@@ -11,6 +11,7 @@ import gzip,pickle
 
 import time
 import argparse
+import pandas as pd
 
 
 torch.manual_seed(0)
@@ -77,7 +78,7 @@ def main_test(opt):
     start_time = time.time()
 
 
-    BLEU,acc,answer,predict = BLEU_Evaluate_test(model,test_dataloader, word_to_index,word_to_index_test, device, max_len)
+    BLEU,acc,answer,predict = BLEU_Evaluate_test(model,test_dataloader, word_to_index,word_to_index_test, device, max_len,model_name = opt.model)
     end_time = time.time()
     result = pd.DataFrame(columns = ['answer','predict'])
     result['answer'] = answer
