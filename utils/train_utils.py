@@ -156,6 +156,7 @@ def BLEU_Evaluate(model,dataloader,criterion, word_to_index,OUTPUT_DIM , device,
     epoch_loss = 0
     BLEU = 0
     acc = 0
+    cnt = 0
     for _,(input, target) in enumerate(dataloader): 
         
         src = input
@@ -181,7 +182,7 @@ def BLEU_Evaluate(model,dataloader,criterion, word_to_index,OUTPUT_DIM , device,
         
         for input_data,target in zip(src,trg2):
             input_data = torch.unsqueeze(input_data, 0)
-
+            cnt += 1
             ref = []
             for t in target:
                 if t == 1:
@@ -189,7 +190,6 @@ def BLEU_Evaluate(model,dataloader,criterion, word_to_index,OUTPUT_DIM , device,
                 else:
                     ref.append(list(word_to_index)[t])
             ref = ' '.join(ref)
-                
             
             candidate = ' '.join(translate_SL(input_data, word_to_index, model, device,max_len))
             ref = re.sub('[sf]','',ref)
@@ -198,10 +198,13 @@ def BLEU_Evaluate(model,dataloader,criterion, word_to_index,OUTPUT_DIM , device,
             else:
                 BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),weights = [1,0,0,0])
                 acc += sum(x == y for x, y in zip(ref.split(), candidate.split())) / len(candidate.split())
-
-
+            if cnt == zero_pred:
+                BLEU , acc = 0
+            else:
+                BLEU = BLEU / (cnt - zero_pred)
+                acc = acc/(cnt - zero_pred)
     # 첫 번째 <sos>는 제외하고 출력 문장 반환
-    return epoch_loss / len(dataloader), BLEU / (len(dataloader) - zero_pred), acc/(len(dataloader) - zero_pred)
+    return epoch_loss / len(dataloader), BLEU, acc
 
 
 def BLEU_Evaluate_test(model,dataloader, word_to_index, word_to_index_test, device , max_len = 81):
@@ -210,9 +213,11 @@ def BLEU_Evaluate_test(model,dataloader, word_to_index, word_to_index_test, devi
     word_to_index: korean index 뭉치
     '''
     model.eval()
-    zero_pred = 0
     BLEU = 0
     acc = 0
+    cnt = 0
+    answer = []
+    predict = []
     for _,(input, target) in enumerate(dataloader): 
         
         src = input
@@ -227,7 +232,7 @@ def BLEU_Evaluate_test(model,dataloader, word_to_index, word_to_index_test, devi
         
         for input_data,target in zip(src,trg): # 배치
             input_data = torch.unsqueeze(input_data, 0)
-
+            cnt += 1
             ref = []
             for t in target:
 
@@ -243,14 +248,14 @@ def BLEU_Evaluate_test(model,dataloader, word_to_index, word_to_index_test, devi
             
             ref = re.sub('[sf]','',ref)
 
-            if len(candidate.split()) == 0:
-                zero_pred += 1
-            else:
-                BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),weights = [1,0,0,0])
-                acc += sum(x == y for x, y in zip(ref.split(), candidate.split())) / len(candidate.split())
+            answer.append(ref)
+            predict.append(candidate)
+
+            BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),weights = [1,0,0,0])
+            acc += sum(x == y for x, y in zip(ref.split(), candidate.split())) / len(candidate.split())
 
 
-    return BLEU / (len(dataloader) - zero_pred), acc/(len(dataloader)-zero_pred)
+    return BLEU / cnt, acc/cnt,answer,predict
 
 def epoch_time(start_time, end_time):
     elapsed_time = end_time - start_time

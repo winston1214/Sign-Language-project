@@ -33,7 +33,7 @@ def main_test(opt):
 
     ## Setting of Hyperparameter
     HID_DIM = opt.hid_dim # 512
-    OUTPUT_DIM = len(train_vocab)+1
+    OUTPUT_DIM = len(train_vocab)
     N_LAYERS = 2
     DEC_DROPOUT = opt.dropout # 0.5
     emb_dim = opt.emb_dim # 128
@@ -49,7 +49,7 @@ def main_test(opt):
 
     dataset = D.TensorDataset(X_test,decoder_input)
 
-    test_dataloader =  torch.utils.data.DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=True)
+    test_dataloader =  torch.utils.data.DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False)
     
     input_size = 246 # keypoint vector 길이
 
@@ -77,11 +77,14 @@ def main_test(opt):
     start_time = time.time()
 
 
-    BLEU,acc = BLEU_Evaluate_test(model,test_dataloader, word_to_index,word_to_index_test, device, max_len)
-    # valid_loss = evaluate(model, val_dataloader, OUTPUT_DIM,criterion)
-
+    BLEU,acc,answer,predict = BLEU_Evaluate_test(model,test_dataloader, word_to_index,word_to_index_test, device, max_len)
     end_time = time.time()
+    result = pd.DataFrame(columns = ['answer','predict'])
+    result['answer'] = answer
+    result['predict'] = predict
 
+    result.to_csv(f'{opt.save_csv}',index=False)
+    print('---save---')
     print(f'Test Time : {end_time - start_time : .3f}')
     print(f'\t TEST BLEU : {BLEU : .3f} | TEST ACC : {acc : .3f}')
 
@@ -95,5 +98,6 @@ if __name__ == '__main__':
     parser.add_argument('--pt',type=str,default='model1.pt',help='save model name')
     parser.add_argument('--csv_name',type=str,default='train_target.csv',help='Target Excel name')
     parser.add_argument('--model',type=str,default='GRU',help='[LSTM,GRU]')
+    parser.add_argument('--save_csv',type=str,default = './result.csv',help = 'save result csv name')
     opt = parser.parse_args()
     main_test(opt)
