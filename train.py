@@ -33,7 +33,7 @@ def main_train(opt):
 
     ## Setting of Hyperparameter
     HID_DIM = opt.hid_dim # 512
-    OUTPUT_DIM = len(vocab)+1
+    OUTPUT_DIM = len(vocab)
     N_LAYERS = 2
     DEC_DROPOUT = opt.dropout # 0.5
     emb_dim = opt.emb_dim # 128
