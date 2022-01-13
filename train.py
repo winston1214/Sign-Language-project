@@ -89,7 +89,7 @@ def main_train(opt):
         start_time = time.time()
 
         train_loss = train(model, train_dataloader, OUTPUT_DIM, optimizer, criterion, CLIP)
-        valid_loss, BLEU,acc = BLEU_Evaluate(model,val_dataloader,criterion, word_to_index, OUTPUT_DIM, device,max_len)
+        valid_loss, BLEU,acc = BLEU_Evaluate(model,val_dataloader,criterion, word_to_index, OUTPUT_DIM, device,max_len,opt.model)
 
         train_loss_ls.append(train_loss)
         val_loss_ls.append(valid_loss)

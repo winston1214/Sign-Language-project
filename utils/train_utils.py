@@ -194,7 +194,7 @@ def translate_SL_ATT(src, word_to_index, model, device, max_len = 81):
     # 첫 번째 <sos>는 제외하고 출력 문장 반환
     return trg_tokens[1:]
 
-def BLEU_Evaluate(model,dataloader,criterion, word_to_index,OUTPUT_DIM , device, max_len = 81):
+def BLEU_Evaluate(model,dataloader,criterion, word_to_index,OUTPUT_DIM , device, max_len = 81,model_name = 'GRU'):
     '''
     src: 번역하고자 하는 keypoint
     word_to_index: korean index 뭉치
@@ -238,8 +238,10 @@ def BLEU_Evaluate(model,dataloader,criterion, word_to_index,OUTPUT_DIM , device,
                 else:
                     ref.append(list(word_to_index)[t])
             ref = ' '.join(ref)
-            
-            candidate = ' '.join(translate_SL(input_data, word_to_index, model, device,max_len))
+            if model_name == 'GRU':
+                candidate = ' '.join(translate_SL_ATT(input_data, word_to_index, model, device,max_len))
+            else:
+                candidate = ' '.join(translate_SL(input_data, word_to_index, model, device,max_len))
             ref = re.sub('[sf]','',ref)
             ref = ref.strip()
             if len(candidate.split()) == 0:
