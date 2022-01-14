@@ -26,7 +26,7 @@ random.seed(0)
 def main_train(opt):
     
     ### Data Loading
-    with gzip.open(opt.X_path + 'X_train.pickle','rb') as f:
+    with gzip.open(opt.X_path,'rb') as f:
         X_data = pickle.load(f)
     excel_name = opt.csv_name # 'C:/Users/winst/Downloads/menmen/train_target.xlsx'
     word_to_index, max_len, vocab,decoder_input = target_preprocessing(excel_name)
