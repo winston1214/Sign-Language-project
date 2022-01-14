@@ -14,7 +14,7 @@ Since the lower body did not appear due to the nature of the dataset, the key po
 |3|LEar|
 |4|REar|
 |5|LShoulder|
-|6|RShulder|
+|6|RShoulder|
 |7|LElbow|
 |8|RElbow|
 |9|LWrist|
