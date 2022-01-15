@@ -57,8 +57,10 @@ $ python frame_split_colab.py --source ${video_path} --output ${save_img_path}
 ```
 **2. Extract KeyPoint(Alphapose)**
 ```
-수정예정
+python scripts/demo_inference.py --cfg configs/halpe_136/resnet/256x192_res50_lr1e-3_2x-regression.yaml --checkpoint pretrained_models/halpe136_fast_res50_256x192.pt --indir ${img_folder_path} --outdir ${save_dir_path} --form boaz --vis_fast --sp
 ```
+
+If you use multi-gpu, you don't have to **sp** option
 
 ## Train
 
