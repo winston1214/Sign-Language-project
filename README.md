@@ -43,7 +43,6 @@ $ sudo apt-get install libyaml-dev
 ## Setting(Alphapose)
 ```
 $ git clone https://github.com/winston1214/Sign-Langugage-project.git && cd Sign-Langugage-project
-$ cd Alphapose-json
 $ python setup.py build develop
 ```
 
