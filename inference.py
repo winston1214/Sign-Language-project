@@ -5,10 +5,12 @@ from scripts.demo_inference import alphapose_inference
 import argparse
 import json
 from preprocessing.frame_split import frame_split
+import time
 
 
 def inference(opt):
     ### video frame split
+    start_time = time.time()
     if os.path.exists('frame'):
         indir = 'frame'
     else:
@@ -16,6 +18,13 @@ def inference(opt):
         indir = 'frame'
     frame_split(opt.video,indir)
     alphapose_inference(opt.checkpoint,opt.cfg,opt.format,indir,opt.outdir,opt.sp) # indir로 frame 저장 폴더 만들기
+    with open('alphapose-results.json','r') as f:
+        data = json.load(f)
+    
+
+    end_time = time.time()
+    print(end_time - start_time)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Sign-Language-Train')
