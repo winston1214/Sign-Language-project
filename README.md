@@ -23,6 +23,12 @@
 - Cuda : 10.0
 - GPU : Tesla V100-32GB
 
+## Download pretrained File(Please Download)
+
+- Detector weight file : <a href='https://drive.google.com/file/d/1fwl4Hpeuu5fneIGWXsUJK0RBvbMDpISP/view?usp=sharing'>yolo detect</a>
+  - Locate **detector/yolo/data/**
+- Keypoint weight file : <a href='https://drive.google.com/file/d/1nTJ04JBuETWjj-pAF37tR-JunVEW9H46/view?usp=sharing'>halpe136_resnet</a>
+  - Locate **pretrained_models/**
 
 ## Data
 
