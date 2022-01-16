@@ -13,6 +13,7 @@ def inference(opt):
         indir = 'frame'
     else:
         os.mkdir('frame')
+        indir = 'frame'
     frame_split(opt.video,indir)
     alphapose_inference(opt.checkpoint,opt.cfg,opt.format,indir,opt.outdir,opt.sp) # indir로 frame 저장 폴더 만들기
 
@@ -24,3 +25,5 @@ if __name__ == '__main__':
     parser.add_argument('--video',type=str)
     parser.add_argument('--outdir',type=str,default='result/')
     parser.add_argument('--sp', default=True,help = 'if you use multi-gpu, check sp False')
+    opt = parser.parse_args()
+    inference(opt)
