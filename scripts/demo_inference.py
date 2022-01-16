@@ -51,7 +51,7 @@ parser.add_argument('--showbox', default=False, action='store_true',
 parser.add_argument('--profile', default=False, action='store_true',
                     help='add speed profiling at screen output')
 parser.add_argument('--format', type=str,
-                    help='save in the format of cmu or coco or openpose, option: coco/cmu/open')
+                    help='save in the format of cmu or coco or openpose, option: coco/cmu/open/boaz')
 parser.add_argument('--min_box_area', type=int, default=0,
                     help='min box area to filter out')
 parser.add_argument('--detbatch', type=int, default=5,
@@ -84,20 +84,7 @@ parser.add_argument('--pose_track', dest='pose_track',
                     help='track humans in video with reid', action='store_true', default=False)
 
 args = parser.parse_args()
-cfg = update_config(args.cfg)
 
-if platform.system() == 'Windows':
-    args.sp = True
-
-args.gpus = [int(i) for i in args.gpus.split(',')] if torch.cuda.device_count() >= 1 else [-1]
-args.device = torch.device("cuda:" + str(args.gpus[0]) if args.gpus[0] >= 0 else "cpu")
-args.detbatch = args.detbatch * len(args.gpus)
-args.posebatch = args.posebatch * len(args.gpus)
-args.tracking = args.pose_track or args.pose_flow or args.detector=='tracker'
-
-if not args.sp:
-    torch.multiprocessing.set_start_method('forkserver', force=True)
-    torch.multiprocessing.set_sharing_strategy('file_system')
 
 
 def check_input():
@@ -160,9 +147,29 @@ def loop():
         n += 1
 
 
-if __name__ == "__main__":
-    mode, input_source = check_input()
+def alphapose_inference(checkpoint,cfg_path,format,indir,outdir,sp = True):
+    args.cfg = cfg_path
+    args.checkpoint = checkpoint
+    args.format = format
+    args.sp = sp
+    args.inputpath = indir
+    args.outputpath = outdir
+    cfg = update_config(args.cfg)
 
+    if platform.system() == 'Windows':
+        args.sp = True
+
+    args.gpus = [int(i) for i in args.gpus.split(',')] if torch.cuda.device_count() >= 1 else [-1]
+    args.device = torch.device("cuda:" + str(args.gpus[0]) if args.gpus[0] >= 0 else "cpu")
+    args.detbatch = args.detbatch * len(args.gpus)
+    args.posebatch = args.posebatch * len(args.gpus)
+    args.tracking = args.pose_track or args.pose_flow or args.detector=='tracker'
+
+    if not args.sp:
+        torch.multiprocessing.set_start_method('forkserver', force=True)
+        torch.multiprocessing.set_sharing_strategy('file_system')
+        mode, input_source = check_input()
+    
     if not os.path.exists(args.outputpath):
         os.makedirs(args.outputpath)
 
@@ -170,22 +177,15 @@ if __name__ == "__main__":
     # detection loader = det_loader
     # mode는? -> check_input() = 위의 함수-> 우리는 mode : 'video'
 
-    if mode == 'webcam':
-        det_loader = WebCamDetectionLoader(input_source, get_detector(args), cfg, args)
-        det_worker = det_loader.start()
-    elif mode == 'detfile':
-        det_loader = FileDetectionLoader(input_source, cfg, args)
-        det_worker = det_loader.start()
-
     # video는 이거
     # input source 는 video file
     # DetectionLoader란?
     # from alphapose.utils.detector import DetectionLoader
     # from detector.apis import get_detector (yolo 불러옴 [if opt.detector == 'yolo':] )
     # opt가 여기서는 args인데 args.detect의 default는 yolo
-    else:
-        det_loader = DetectionLoader(input_source, get_detector(args), cfg, args, batchSize=args.detbatch, mode=mode, queueSize=args.qsize)
-        det_worker = det_loader.start()
+
+    det_loader = DetectionLoader(input_source, get_detector(args), cfg, args, batchSize=args.detbatch, mode=mode, queueSize=args.qsize)
+    det_worker = det_loader.start()
 
     # Load pose model
     # pose model이란?
