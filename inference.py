@@ -1,6 +1,6 @@
 import sys
 import os
-sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+# sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from model.seq2seq_lstm import LSTM_Encoder,LSTM_Decoder,LSTM_Seq2Seq
 from model.seq2seq_gru_attention import GRU_AT_Decoder, GRU_AT_Encoder, GRU_AT_Seq2Seq, Attention
 from scripts.demo_inference import alphapose_inference
@@ -13,7 +13,6 @@ import json
 import time
 import re
 import numpy as np
-from tqdm.notebook import tqdm
 import torch
 import torch.utils.data as D
 import torch.backends.cudnn as cudnn
@@ -43,17 +42,24 @@ def inference(opt):
     else:
         os.mkdir('frame')
         indir = 'frame'
-    frame_split(opt.video,indir)
-    alphapose_inference(opt.checkpoint,opt.cfg,opt.format,indir,opt.outdir,opt.sp) # indir로 frame 저장 폴더 만들기
+    video_name = opt.video.split('/')[-1]
+    frame_split(video_name,indir)
+    checkpoint = opt.checkpoint
+    cfg = opt.cfg
+    format = opt.format
+    outdir = opt.outdir
+    sp = opt.sp
+    alphapose_inference(checkpoint,cfg,format,indir,outdir,sp) # indir로 frame 저장 폴더 만들기
     with open('alphapose-results.json','r') as f:
         data = json.load(f)
     max_frame_num = 376
     video_key = np.array([])
     num_ls = []
     for i in data: # 전체 영상 증가 - frame normalization
-        num = i.split('_')[3]
-        num = re.sub('.jpg','',num)
+
+        num = re.sub('.jpg','',i)
         num_ls.append(int(num))
+
         dt = data[i]['keypoints']
         dt = np.array(dt).reshape(123,3)
         dt = dt[:,:2]
@@ -75,6 +81,7 @@ def inference(opt):
     else:
         video_key = video_key[-max_frame_num:]
     X_data = torch.tensor(video_key)
+    X_data = torch.unsqueeze(X_data,0)
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print('device : ', device)
@@ -101,13 +108,16 @@ def inference(opt):
     model.apply(init_weights)
     model.load_state_dict(torch.load(opt.pt))
 
-    if opt.model == 'LSTM':
-        print(translate_SL(X_data,word_to_index,model,device))
-    if opt.model == 'GRU':
-        print(translate_SL_ATT(X_data,word_to_index,model,device))
 
+    if opt.model == 'LSTM':
+        translate = translate_SL(X_data,word_to_index,model,device)
+        
+    if opt.model == 'GRU':
+        translate = translate_SL_ATT(X_data,word_to_index,model,device)
+    sentence = ' '.join(translate)
+    print(f'Sign Language Translate : {sentence}')
     end_time = time.time()
-    print(end_time - start_time)
+    print(f'Time : {end_time - start_time :02} sec')
 
 
 if __name__ == '__main__':
@@ -123,6 +133,6 @@ if __name__ == '__main__':
     parser.add_argument('--emb_dim',type=int,default=128,help = 'Nuber of embedding demension') # No modify
     parser.add_argument('--csv_name',type=str,default='train_target.csv',help='Target Excel name')
     parser.add_argument('--model',type=str,default='GRU',help='[LSTM,GRU]')
-    parser.add_argument('--pt',type=str,default='model1.pt',help='save model name')
+    parser.add_argument('--pt',type=str,default='GRU_TUNNING.pt',help='save model name')
     opt = parser.parse_args()
     inference(opt)

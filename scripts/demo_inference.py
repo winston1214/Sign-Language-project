@@ -24,14 +24,16 @@ from alphapose.utils.writer import DataWriter
 
 """----------------------------- Demo options -----------------------------"""
 parser = argparse.ArgumentParser(description='AlphaPose Demo')
-parser.add_argument('--cfg', type=str, required=True,
+parser.add_argument('--cfg', type=str, required=False,
                     help='experiment configure file name')
-parser.add_argument('--checkpoint', type=str, required=True,
+parser.add_argument('--checkpoint', type=str, required=False,
                     help='checkpoint file name')
 parser.add_argument('--sp', default=False, action='store_true',
                     help='Use single process for pytorch')
 parser.add_argument('--detector', dest='detector',
                     help='detector name', default="yolo")
+parser.add_argument('--pt',type=str,default='GRU_TUNNING.pt',help='save model name')
+parser.add_argument('--model',type=str,default='GRU',help='[LSTM,GRU]')
 parser.add_argument('--detfile', dest='detfile',
                     help='detection result file', default="")
 parser.add_argument('--indir', dest='inputpath',

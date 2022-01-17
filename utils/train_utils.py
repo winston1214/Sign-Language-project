@@ -107,6 +107,9 @@ def translate_SL(src, word_to_index, model, device, max_len = 81):
     src: 번역하고자 하는 keypoint
     word_to_index: korean index 뭉치
     '''
+    if torch.cuda.is_available():
+        model.cuda()
+        src = src.cuda().float()
 
     model.eval()
 
@@ -152,7 +155,9 @@ def translate_SL_ATT(src, word_to_index, model, device, max_len = 81):
     src: 번역하고자 하는 keypoint
     word_to_index: korean index 뭉치
     '''
-
+    if torch.cuda.is_available():
+        model.cuda()
+        src = src.cuda().float()
     model.eval()
 
   # sign_language = "<sos>" + sign_language + "<eos>"
