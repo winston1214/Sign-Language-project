@@ -1,6 +1,6 @@
 # Result
 
-## Compare of Argumentation Method(Hand frame vs All Frame)
+## Compare of Argumentation Method(Hand Frame vs All Frame)
 <table>
     <thead>
         <tr>
