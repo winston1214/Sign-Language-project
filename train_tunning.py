@@ -56,7 +56,7 @@ def main_train(opt):
     train_dataset, val_dataset = D.random_split(dataset, [len(dataset) - int(len(dataset) * 0.2), int(len(dataset) * 0.2)]) # 8:2 split
     train_dataloader =  torch.utils.data.DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, drop_last=True)
     val_dataloader =  torch.utils.data.DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=True, drop_last=True)
-    input_size = 246 # keypoint vector 길이
+    input_size = X_data.shape[-1] # keypoint vector 길이
 
 
     ## Define Model

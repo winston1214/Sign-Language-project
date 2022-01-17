@@ -52,7 +52,7 @@ def main_test(opt):
 
     test_dataloader =  torch.utils.data.DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False)
     
-    input_size = 246 # keypoint vector 길이
+    input_size = X_test.shape[-1] # keypoint vector 길이
 
 
     ## Define Model
@@ -70,6 +70,7 @@ def main_test(opt):
 
     model.apply(init_weights)
     model.load_state_dict(torch.load(opt.pt))
+    
 
 
     ## Test
