@@ -37,6 +37,8 @@ def inference(opt):
     ### video frame split
     start_time = time.time()
     if os.path.exists('frame'):
+        os.remove('frame')
+        os.mkdir('frame')
         indir = 'frame'
     else:
         os.mkdir('frame')
