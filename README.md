@@ -34,14 +34,11 @@
 
 <a href='https://aihub.or.kr/opendata/keti-data/recognition-laguage/KETI-02-003'>DataSet Download</a>
 
-<img src='https://github.com/winston1214/Sign-Langugage-project/blob/master/picture/sample_data.gif?raw=true'></img>
+<img src='https://github.com/winston1214/Sign-Langugage-project/blob/master/picture/sample_data.gif?raw=true' height='50%' width='50%'></img>
 
 ## Install Module
 ```
-$ pip install pyyaml==5.2
-$ pip install scipy==1.1.0
-$ pip install pillow==6.2.2
-$ pip install torch==1.2.0 torchvision==0.4.0
+$ pip install -r requirements.txt
 $ python -m pip install cython
 $ sudo apt-get install libyaml-dev
 ```
@@ -56,9 +53,9 @@ If you don't run in the COLAB environment or the **cuda version is 10.0**, refer
 
 ## PreProcessing
 
-**1. Split frame(Colab)**
+**1. Split frame**
 ```
-$ python frame_split_colab.py --source ${video_path} --output ${save_img_path}
+$ python frame_split.py # You have to add the main code.
 ```
 **2. Extract KeyPoint(Alphapose)**
 ```
@@ -66,6 +63,9 @@ python scripts/demo_inference.py --cfg configs/halpe_136/resnet/256x192_res50_lr
 ```
 
 If you use multi-gpu, you don't have to **sp** option
+
+## Extract KeyPoint
+<img src='https://github.com/winston1214/Sign-Langugage-project/blob/master/picture/alphapose.gif?raw=true'></img>
 
 ## Train
 
@@ -81,6 +81,3 @@ $ python train.py --X_path /sign_data/ --save_path pt_file/ \
 - X_train.pickle : For convenience, we stored and used the values extracted from the keypoint in **pickle file format**.
   - (shape : [video_len, max_frame_len, keypoint_len] # [7129, 376, 246] )
 
-
-## Extract KeyPoint
-<img src='https://github.com/winston1214/Sign-Langugage-project/blob/master/picture/alphapose.gif?raw=true'></img>
