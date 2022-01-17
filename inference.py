@@ -1,6 +1,5 @@
 import sys
 import os
-# sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from model.seq2seq_lstm import LSTM_Encoder,LSTM_Decoder,LSTM_Seq2Seq
 from model.seq2seq_gru_attention import GRU_AT_Decoder, GRU_AT_Encoder, GRU_AT_Seq2Seq, Attention
 from scripts.demo_inference import alphapose_inference
