@@ -30,7 +30,11 @@
 - Keypoint weight file : <a href='https://drive.google.com/file/d/1nTJ04JBuETWjj-pAF37tR-JunVEW9H46/view?usp=sharing'>halpe136_resnet</a>
   - Locate **pretrained_models/**
 
+If you run this command, you can download it at once. ```$ sh downlaod_sh/weight_download.sh```
+
 ## Data
+
+- sample video downlaod - ```$ sh download_sh/sample_data_dowonload.sh```
 
 <a href='https://aihub.or.kr/opendata/keti-data/recognition-laguage/KETI-02-003'>DataSet Download</a>
 
