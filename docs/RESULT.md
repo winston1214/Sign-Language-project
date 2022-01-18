@@ -193,8 +193,8 @@
             <th>Model</th>
             <th>Hyperparameter</th>
             <th>Metrics</th>
-            <th>Hand + Face + Body<br>(Baseline)</th>
-            <th>Hand + Body</th>
+            <th>Frame Normalization<br>(Baseline)</th>
+            <th>Video Normalization</th>
         </tr>
     </thead>
     <tbody>
@@ -202,47 +202,47 @@
             <td rowspan=4>GRU-Attention</td>
             <td rowspan=2>Adam<br>CrossEntropy</td>
             <td>BLEU</td>
-            <td>90.1</td>
-            <td><b>추가</b></td>
+            <td><b>90.1</b></td>
+            <td>86.2</td>
         </tr>
         <tr>
             <td>Accuracy</td>
-            <td>90.4</td>
-            <td><b>추가</b></td>
+            <td><b>90.4</b></td>
+            <td>86.5</td>
         </tr>
         <tr>
             <td rowspan=2>AdamW<br>Scheduler</td>
             <td>BLEU</td>
-            <td>90.0</td>
-            <td><b>추가</b></td>
+            <td><b>90.0</b></td>
+            <td>89.7</td>
         </tr>
         <tr>
             <td>Accuracy</td>
             <td>89.8</td>
-            <td><b>추가</b></td>
+            <td><b>90.0</b></td>
         </tr>
         <tr>
             <td rowspan=4>LSTM</td>
             <td rowspan=2>Adam<br>CrossEntropy</td>
             <td>BLEU</td>
             <td><b>73.4</b></td>
-            <td>추가</td>
+            <td>59.6</td>
         </tr>
         <tr>
             <td>Accuracy</td>
             <td><b>73.3</b></td>
-            <td>추가</td>
+            <td>59.4</td>
         </tr>
         <tr>
             <td rowspan=2>AdamW<br>Scheduler</td>
             <td>BLEU</td>
             <td><b>73.4</b></td>
-            <td>추가</td>
+            <td>60.8</td>
         </tr>
         <tr>
             <td>Accuracy</td>
             <td><b>73.3</b></td>
-            <td>추가</td>
+            <td>60.8</td>
         </tr>
     </tbody>
 </table>
