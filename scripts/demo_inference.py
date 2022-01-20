@@ -290,11 +290,11 @@ def alphapose_inference(checkpoint,cfg_path,format,indir,outdir,sp = True):
                         dt=np.mean(runtime_profile['dt']), pt=np.mean(runtime_profile['pt']), pn=np.mean(runtime_profile['pn']))
                 )
         print_finish_info()
-        while(writer.running()):
-            time.sleep(1)
-            print('===========================> Rendering remaining ' + str(writer.count()) + ' images in the queue...')
-        writer.stop()
-        det_loader.stop()
+#         while(writer.running()):
+#             time.sleep(1)
+#             print('===========================> Rendering remaining ' + str(writer.count()) + ' images in the queue...')
+#         writer.stop()
+#         det_loader.stop()
     except Exception as e:
         print(repr(e))
         print('An error as above occurs when processing the images, please check it')
