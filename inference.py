@@ -81,7 +81,7 @@ def inference(opt):
             video_key = np.insert(video_key,insert_num,video_key[insert_num],axis=0)
     else:
         video_key = video_key[-max_frame_num:]
-    print(video_key.shape)
+
     video_key = video_key[::-1]
     reverse_video = video_key.copy()
     X_data = torch.tensor(reverse_video)
