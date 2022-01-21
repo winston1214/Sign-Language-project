@@ -37,7 +37,7 @@ parser.add_argument('--model',type=str,default='GRU',help='[LSTM,GRU]')
 parser.add_argument('--detfile', dest='detfile',
                     help='detection result file', default="")
 parser.add_argument('--indir', dest='inputpath',
-                    help='image-directory', default="")
+                    help='image-directory', default="frame")
 parser.add_argument('--list', dest='inputlist',
                     help='image-list', default="")
 parser.add_argument('--image', dest='inputimg',
@@ -73,6 +73,7 @@ parser.add_argument('--debug', default=False, action='store_true',
 """----------------------------- Video options -----------------------------"""
 parser.add_argument('--video', dest='video',
                     help='video-name', default="")
+parser.add_argument('--video_name',type=str)
 parser.add_argument('--webcam', dest='webcam', type=int,
                     help='webcam number', default=-1)
 parser.add_argument('--save_video', dest='save_video',
@@ -114,16 +115,17 @@ def check_input():
 
     # for images
     if len(args.inputpath) or len(args.inputlist) or len(args.inputimg):
+        
         inputpath = args.inputpath
         inputlist = args.inputlist
         inputimg = args.inputimg
-
         if len(inputlist):
             im_names = open(inputlist, 'r').readlines()
         elif len(inputpath) and inputpath != '/':
             for root, dirs, files in os.walk(inputpath):
                 im_names = files
             im_names = natsort.natsorted(im_names)
+            
 
         elif len(inputimg):
             args.inputpath = os.path.split(inputimg)[0]
@@ -149,12 +151,11 @@ def loop():
         n += 1
 
 
-def alphapose_inference(checkpoint,cfg_path,format,indir,outdir,sp = True):
+def alphapose_inference(checkpoint,cfg_path,format,outdir,sp = True):
     args.cfg = cfg_path
     args.checkpoint = checkpoint
     args.format = format
     args.sp = sp
-    args.inputpath = indir
     args.outputpath = outdir
     cfg = update_config(args.cfg)
 
@@ -167,6 +168,7 @@ def alphapose_inference(checkpoint,cfg_path,format,indir,outdir,sp = True):
     args.posebatch = args.posebatch * len(args.gpus)
     args.tracking = args.pose_track or args.pose_flow or args.detector=='tracker'
     mode, input_source = check_input()
+    
     if not args.sp:
         torch.multiprocessing.set_start_method('forkserver', force=True)
         torch.multiprocessing.set_sharing_strategy('file_system')
@@ -211,7 +213,6 @@ def alphapose_inference(checkpoint,cfg_path,format,indir,outdir,sp = True):
         'pt': [],
         'pn': []
     }
-
     # Init data writer
     queueSize = 2 if mode == 'webcam' else args.qsize
     # video에 해당
@@ -290,11 +291,11 @@ def alphapose_inference(checkpoint,cfg_path,format,indir,outdir,sp = True):
                         dt=np.mean(runtime_profile['dt']), pt=np.mean(runtime_profile['pt']), pn=np.mean(runtime_profile['pn']))
                 )
         print_finish_info()
-#         while(writer.running()):
-#             time.sleep(1)
-#             print('===========================> Rendering remaining ' + str(writer.count()) + ' images in the queue...')
-#         writer.stop()
-#         det_loader.stop()
+        while(writer.running()):
+            time.sleep(1)
+            print('===========================> Rendering remaining ' + str(writer.count()) + ' images in the queue...')
+        writer.stop()
+        det_loader.stop()
     except Exception as e:
         print(repr(e))
         print('An error as above occurs when processing the images, please check it')
@@ -315,4 +316,3 @@ def alphapose_inference(checkpoint,cfg_path,format,indir,outdir,sp = True):
             writer.terminate()
             writer.clear_queues()
             det_loader.clear_queues()
-

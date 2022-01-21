@@ -17,6 +17,7 @@ import torch.utils.data as D
 import torch.backends.cudnn as cudnn
 import random
 import numpy as np
+import shutil
 
 import time
 import argparse
@@ -37,20 +38,17 @@ def inference(opt):
     ### video frame split
     start_time = time.time()
     if os.path.exists('frame'):
-        os.remove('frame')
-        os.mkdir('frame')
-        indir = 'frame'
-    else:
-        os.mkdir('frame')
-        indir = 'frame'
-    video_name = opt.video.split('/')[-1]
+        shutil.rmtree('frame')
+    os.mkdir('frame')
+    indir = 'frame/'
+    video_name = opt.video_name.split('/')[-1]
     frame_split(video_name,indir)
     checkpoint = opt.checkpoint
     cfg = opt.cfg
     format = opt.format
     outdir = opt.outdir
     sp = opt.sp
-    alphapose_inference(checkpoint,cfg,format,indir,outdir,sp) # indir로 frame 저장 폴더 만들기
+    alphapose_inference(checkpoint,cfg,format,outdir,sp) # indir로 frame 저장 폴더 만들기
     with open('alphapose-results.json','r') as f:
         data = json.load(f)
     max_frame_num = 376
@@ -126,7 +124,7 @@ if __name__ == '__main__':
     parser.add_argument('--checkpoint',type=str,default='pretrained_models/halpe136_fast_res50_256x192.pth',help = 'download pth')  # No modify
     parser.add_argument('--cfg', type=str, default='configs/halpe_136/resnet/256x192_res50_lr1e-3_2x-regression.yaml',help='cfg')  # No modify
     parser.add_argument('--format',type=str,default='boaz',help='coco,open,cmu,boaz')  # No modify
-    parser.add_argument('--video',type=str)
+    parser.add_argument('--video_name',type=str)
     parser.add_argument('--outdir',type=str,default='result/')
     parser.add_argument('--sp', default=True,help = 'if you use multi-gpu, check sp False')
     parser.add_argument('--hid_dim', type=int, default=512,help='Number of hidden demension') # No modify
