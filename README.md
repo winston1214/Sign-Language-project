@@ -144,6 +144,11 @@ We selected a method that applied the **(HAND+BODY Keypoint) + (All Frame Random
 
 More experimental results are shown <a href='https://github.com/winston1214/Sign-Langugage-project/blob/master/docs/RESULT.md'>here</a>.
 
+## Demo Video
+<a href='https://www.youtube.com/watch?v=4E18JKXhl8w'>youtube link</a>
 
-{% include video_link.html id="4E18JKXhl8w"%}  
+https://user-images.githubusercontent.com/47775179/150514151-e50bb76c-7556-42dd-bad3-24ffd2047066.mp4
+
+
+
 
