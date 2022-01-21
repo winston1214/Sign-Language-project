@@ -72,7 +72,7 @@ def inference(opt):
         video_key = np.append(video_key,dt)
     start_num = min(num_ls)
     video_key = video_key.reshape(-1,110)
-    video_key = video_key[:, ::-1]
+    
     if len(data) < max_frame_num:
         random_choice_frame = np.random.choice(num_ls,max_frame_num - max(num_ls) + start_num -1)
         random_choice_frame.sort()
@@ -81,7 +81,10 @@ def inference(opt):
             video_key = np.insert(video_key,insert_num,video_key[insert_num],axis=0)
     else:
         video_key = video_key[-max_frame_num:]
-    X_data = torch.tensor(video_key)
+    print(video_key.shape)
+    video_key = video_key[::-1]
+    reverse_video = video_key.copy()
+    X_data = torch.tensor(reverse_video)
     X_data = torch.unsqueeze(X_data,0)
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
