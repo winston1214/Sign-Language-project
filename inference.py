@@ -54,13 +54,14 @@ def inference(opt):
     max_frame_num = 376
     video_key = np.array([])
     num_ls = []
-    for i in data: # 전체 영상 증가 - frame normalization
+    for i in data: # 전체 영상 증가 - frame normalization + face remove + reverse
 
         num = re.sub('.jpg','',i)
         num_ls.append(int(num))
 
         dt = data[i]['keypoints']
         dt = np.array(dt).reshape(123,3)
+        dt = np.delete(dt,range(13,81),axis=0)
         dt = dt[:,:2]
         x,y = dt[:,0],dt[:,1]
         mean_x, mean_y = np.mean(x),np.mean(y)
@@ -70,7 +71,8 @@ def inference(opt):
         dt[:,1] = normal_y
         video_key = np.append(video_key,dt)
     start_num = min(num_ls)
-    video_key = video_key.reshape(-1,246)
+    video_key = video_key.reshape(-1,110)
+    video_key = video_key[:, ::-1]
     if len(data) < max_frame_num:
         random_choice_frame = np.random.choice(num_ls,max_frame_num - max(num_ls) + start_num -1)
         random_choice_frame.sort()
