@@ -140,7 +140,7 @@ You can simply enjoy demo video at the COLAB [![Open In Colab](https://colab.res
     </tbody>
 </table>
 
-We selected a method that applied the **(HAND+BODY Keypoint) + (All Frame Random Argumentation) + (Frame Noramlization)** technique as the final model.
+We selected a method that applied the **(HAND+BODY Keypoint) + (All Frame Random Augmentation) + (Frame Noramlization)** technique as the final model.
 
 More experimental results are shown <a href='https://github.com/winston1214/Sign-Langugage-project/blob/master/docs/RESULT.md'>here</a>.
 
