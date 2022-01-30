@@ -3,7 +3,7 @@ from tqdm.notebook import tqdm
 import re
 import math
 
-def keti(data): # 전체 frame에 대해서 random하게 증강
+def keti(data): # 전체 frame에 대해서 random하게 증강, sampling
     np.random.seed(42)
     X_train=np.array([])
     num_ls = []
@@ -120,13 +120,12 @@ def keti(data): # 전체 frame에 대해서 random하게 증강
     return X_train
 
 
-def video_sampling2(data): # original video에서 hand video 부분만 random하게 frame 증강
+def hand_normalization(data): # 손 위치 고려
     np.random.seed(42)
     X_train=np.array([])
     num_ls = []
     max_frame_num = 0
     min_frame_num = []
-    tmp = []
     video_set = set()
     hand_frame_ls = np.array([])
     minimum = 1e+5
@@ -174,22 +173,30 @@ def video_sampling2(data): # original video에서 hand video 부분만 random하
         num2 = num_ls[idx]
         dt = data[i]['keypoints']
         dt = np.array(dt).reshape(123,3)
+#         dt = np.delete(dt,range(13,81),axis=0) # 얼굴 키포인트 제외
+        wrist = np.max([dt[9][1], dt[10][1]]) # 허리
+        left_hand = np.mean(dt[:,1][81:102])
+        right_hand = np.mean(dt[:,1][102:])
+        
+        if (left_hand < wrist) or (right_hand < wrist): # hand 탐지 될 때
+            video_hand_idx.append(int(num2)) # hand frame number
+            hand_frame_ls = np.append(hand_frame_ls,dt[:,:2].flatten())
+            
         mean_x,std_x = np.mean(dt[:,0]),np.std(dt[:,0]) # noramlization
         mean_y,std_y = np.mean(dt[:,1]),np.std(dt[:,1]) # normalization
         normalization_x, normalization_y = (dt[:,0] - mean_x)/std_x, (dt[:,1] - mean_y)/std_y # normalization
         dt[:,0] = normalization_x # normalization
-        dt[:,1] = normalization_y # normalization
-        
-        if np.mean(dt[81:,2])>0.1: # hand 탐지 될 때
-            video_hand_idx.append(int(num2)) # hand frame number
-            hand_frame_ls = np.append(hand_frame_ls,dt[:,:2].flatten())
-            
+        dt[:,1] = normalization_y # normalization  
             
         try:
             if num_ls[idx+1]-num_ls[idx] < 0:
                 video_frame = np.append(video_frame,dt[:,:2])
                 hand_frame_ls = hand_frame_ls.reshape(-1,246)
                 video_frame = video_frame.reshape(-1,246)
+                if video_name[idx] == 'KETI_SL_0000041984_173.jpg':
+                    avg = np.mean([video_frame[100],video_frame[101]],axis=0)
+                    video_frame = np.insert(video_frame,100,avg,axis=0)
+                    video_frame = video_frame.reshape(-1,246)
 
                 if video_frame.shape[0] < max_frame_num: # 비디오프레임이 최대 비디오프레임보다 적을 때
                     start_number = video_dic['_'.join(video_name[idx].split('.')[0].split('_')[:-1])]
@@ -207,6 +214,8 @@ def video_sampling2(data): # original video에서 hand video 부분만 random하
                         for random_idx,h in enumerate(random_choice_hand):
 
                             video_frame = np.insert(video_frame,h+random_idx,video_frame[h+random_idx],axis=0) # 손 부분만 증강
+                else:
+                    video_frame = video_frame[-max_frame_num:]
 
                 if video_frame.shape[0] != max_frame_num: # error check
                     print('error!')
@@ -247,6 +256,8 @@ def video_sampling2(data): # original video에서 hand video 부분만 random하
                     print('error!')
                     print(list(data.keys())[idx]) # error check
                     print(video_frame.shape) # error check
+            else:
+                video_frame = video_frame[-max_frame_num:]
             X_train = np.append(X_train,video_frame).reshape(-1,246)
 
             video_frame = np.array([])
