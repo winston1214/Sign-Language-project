@@ -268,7 +268,7 @@ def hand_normalization(data): # 손 위치 고려
     
     return X_train
 
-def body_hand_normalization(data): # face 제외하고 hand 부분 random 하게 추출
+def face_remove_normalization(data): # 손 위치 고려
     np.random.seed(42)
     X_train=np.array([])
     num_ls = []
@@ -322,16 +322,19 @@ def body_hand_normalization(data): # face 제외하고 hand 부분 random 하게
         dt = data[i]['keypoints']
         dt = np.array(dt).reshape(123,3)
         dt = np.delete(dt,range(13,81),axis=0) # 얼굴 키포인트 제외
+        wrist = np.max([dt[9][1], dt[10][1]]) # 허리
+        left_hand = np.mean(dt[:,1][13:34])
+        right_hand = np.mean(dt[:,1][34:])
+        
+        if (left_hand < wrist) or (right_hand < wrist): # hand 탐지 될 때
+            video_hand_idx.append(int(num2)) # hand frame number
+            hand_frame_ls = np.append(hand_frame_ls,dt[:,:2].flatten())
+            
         mean_x,std_x = np.mean(dt[:,0]),np.std(dt[:,0]) # noramlization
         mean_y,std_y = np.mean(dt[:,1]),np.std(dt[:,1]) # normalization
         normalization_x, normalization_y = (dt[:,0] - mean_x)/std_x, (dt[:,1] - mean_y)/std_y # normalization
         dt[:,0] = normalization_x # normalization
-        dt[:,1] = normalization_y # normalization
-        
-        if np.mean(dt[81:,2])>0.1: # hand 탐지 될 때
-            video_hand_idx.append(int(num2)) # hand frame number
-            hand_frame_ls = np.append(hand_frame_ls,dt[:,:2].flatten())
-            
+        dt[:,1] = normalization_y # normalization  
             
         try:
             if num_ls[idx+1]-num_ls[idx] < 0:
