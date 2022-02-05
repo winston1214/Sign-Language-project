@@ -900,7 +900,11 @@ def skip_argumentation_all(data): # 전체 프레임
     
     return X_train
 
+<<<<<<< HEAD
 def skip_hand_argumentation_hand(data): # random하게 선택
+=======
+def skip_random_argumentation(data): # random하게 선택
+>>>>>>> 42419b94a5931e606bbb65f53ea958866dbf9cc8
     np.random.seed(42)
     X_train=np.array([])
     num_ls = []
@@ -912,7 +916,10 @@ def skip_hand_argumentation_hand(data): # random하게 선택
     video_dic = {}
     max_frame_ls = []
     video_name = [] # video 밀리는 경우 방지(frame이 0번째부터 있지 않을 수 있음)
+<<<<<<< HEAD
     pelvis = [] # 골반
+=======
+>>>>>>> 42419b94a5931e606bbb65f53ea958866dbf9cc8
     for idx,i in tqdm(enumerate(data)):
         # print(idx) # 반복 횟수 1
         # print(i) # video name : KETI_SL_0000035402_0.jpg
@@ -921,7 +928,10 @@ def skip_hand_argumentation_hand(data): # random하게 선택
          # print(num2) # frame number
         num_ls.append(int(num2))   # num_ls : frame number들의 list   num_ls = [0]
         video_name.append(i) # video name : KETI_SL_0000035402_90.jpg
+<<<<<<< HEAD
 
+=======
+>>>>>>> 42419b94a5931e606bbb65f53ea958866dbf9cc8
         video_set.add('_'.join(i.split('.')[0].split('_')[:-1]))
 
     for idx,i in tqdm(enumerate(data)):
@@ -949,6 +959,7 @@ def skip_hand_argumentation_hand(data): # random하게 선택
     for k,v in zip(video_set,min_frame_num):
         video_dic[k] = v
     
+<<<<<<< HEAD
     for (k,v),m in zip(video_dic.items(),max_frame_ls):
         name = k+'_'+str(v)+'.jpg'
         l = data[name]['keypoints'][0][9][1]
@@ -957,6 +968,8 @@ def skip_hand_argumentation_hand(data): # random하게 선택
         if 'KETI_SL_0000041984' in name:
             p = [max(l,r)] * (m - v)
         pelvis.extend(p)
+=======
+>>>>>>> 42419b94a5931e606bbb65f53ea958866dbf9cc8
     mean_frame_num = int(np.mean(max_frame_ls))
     max_frame_num += 1 # 0부터 시작해서
     video_hand_idx = []
@@ -970,6 +983,7 @@ def skip_hand_argumentation_hand(data): # random하게 선택
         dt = data[i]['keypoints']
         dt = np.array(dt).reshape(123,3)
         dt = np.delete(dt,range(13,81),axis=0) # 얼굴 키포인트 제외
+<<<<<<< HEAD
         start_number = video_dic['_'.join(video_name[idx].split('.')[0].split('_')[:-1])]
         head = dt[:,1][11]
         wrist = pelvis[idx]
@@ -984,6 +998,16 @@ def skip_hand_argumentation_hand(data): # random하게 선택
                 video_hand_idx.append(int(num2)) # hand frame number
                 hand_frame_ls = np.append(hand_frame_ls,dt[:,:2].flatten())
 
+=======
+        wrist = np.max([dt[9][1], dt[10][1]]) # 허리
+        left_hand = np.mean(dt[:,1][13:34])
+        right_hand = np.mean(dt[:,1][34:])
+        
+        if (left_hand < wrist) or (right_hand < wrist): # hand 탐지 될 때
+            video_hand_idx.append(int(num2)) # hand frame number
+            hand_frame_ls = np.append(hand_frame_ls,dt[:,:2].flatten())
+            
+>>>>>>> 42419b94a5931e606bbb65f53ea958866dbf9cc8
         mean_x,std_x = np.mean(dt[:,0]),np.std(dt[:,0]) # noramlization
         mean_y,std_y = np.mean(dt[:,1]),np.std(dt[:,1]) # normalization
         normalization_x, normalization_y = (dt[:,0] - mean_x)/std_x, (dt[:,1] - mean_y)/std_y # normalization
@@ -1001,7 +1025,11 @@ def skip_hand_argumentation_hand(data): # random하게 선택
                     video_frame = video_frame.reshape(-1,110)
 
                 if video_frame.shape[0] < mean_frame_num: # 비디오프레임이 최대 비디오프레임보다 적을 때
+<<<<<<< HEAD
                     
+=======
+                    start_number = video_dic['_'.join(video_name[idx].split('.')[0].split('_')[:-1])]
+>>>>>>> 42419b94a5931e606bbb65f53ea958866dbf9cc8
                     if len(video_hand_idx) == 0: # 손이 하나도 안뽑힐 때
                         video_hand_idx = list(range(num_ls[idx]))
                     if start_number != 0: # 시작 프레임이 0이 아닐 때
@@ -1011,13 +1039,17 @@ def skip_hand_argumentation_hand(data): # random하게 선택
                             insert_num = h+random_idx-start_number
                             video_frame = np.insert(video_frame,insert_num,video_frame[insert_num],axis=0) # 손 부분만 증강
                     else:
+<<<<<<< HEAD
 
+=======
+>>>>>>> 42419b94a5931e606bbb65f53ea958866dbf9cc8
                         random_choice_hand = np.random.choice(video_hand_idx,mean_frame_num - num_ls[idx]-1) # 중복 허용
                         random_choice_hand.sort()
                         for random_idx,h in enumerate(random_choice_hand):
 
                             video_frame = np.insert(video_frame,h+random_idx,video_frame[h+random_idx],axis=0) # 손 부분만 증강
                 else:
+<<<<<<< HEAD
 #                     video_frame_idx = [i for i in range(len(video_frame))]
 
                     select_frame = np.random.choice(video_hand_idx,mean_frame_num,replace=True)
@@ -1029,6 +1061,12 @@ def skip_hand_argumentation_hand(data): # random하게 선택
                         print(video_frame.shape)
                     video_frame = video_frame[select_frame]
                         
+=======
+                    video_frame_idx = [i for i in range(len(video_frame))]
+                    select_frame = np.random.choice(video_frame_idx,mean_frame_num,replace=False)
+                    select_frame.sort()
+                    video_frame = video_frame[select_frame]
+>>>>>>> 42419b94a5931e606bbb65f53ea958866dbf9cc8
 #                     video_frame = video_frame[-max_frame_num:]
                 
                 if video_frame.shape[0] != mean_frame_num: # error check
@@ -1071,10 +1109,17 @@ def skip_hand_argumentation_hand(data): # random하게 선택
                     print(list(data.keys())[idx]) # error check
                     print(video_frame.shape) # error check
             else:
+<<<<<<< HEAD
 #                 video_frame_idx = [i for i in range(len(video_frame))]
                 select_frame = np.random.choice(video_hand_idx,mean_frame_num,replace=True)
                 select_frame.sort()
                 select_frame = list(map(lambda x: x-start_number,select_frame))
+=======
+                video_frame_idx = [i for i in range(len(video_frame))]
+                select_frame = np.random.choice(video_frame_idx,mean_frame_num,replace=False)
+                select_frame.sort()
+                video_frame = video_frame[select_frame]
+>>>>>>> 42419b94a5931e606bbb65f53ea958866dbf9cc8
                 video_frame = video_frame[select_frame]
             X_train = np.append(X_train,video_frame).reshape(-1,110)
 
