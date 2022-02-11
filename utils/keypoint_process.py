@@ -1098,6 +1098,7 @@ def skip_random_argumentation(data): # random하게 선택
     video_dic = {}
     max_frame_ls = []
     video_name = [] # video 밀리는 경우 방지(frame이 0번째부터 있지 않을 수 있음)
+    pelvis = [] # 골반
     for idx,i in tqdm(enumerate(data)):
         # print(idx) # 반복 횟수 1
         # print(i) # video name : KETI_SL_0000035402_0.jpg
@@ -1132,7 +1133,14 @@ def skip_random_argumentation(data): # random하게 선택
     video_set = sorted(list(video_set))
     for k,v in zip(video_set,min_frame_num):
         video_dic[k] = v
-    
+    for (k,v),m in zip(video_dic.items(),max_frame_ls):
+        name = k+'_'+str(v)+'.jpg'
+        l = data[name]['keypoints'][0][9][1]
+        r = data[name]['keypoints'][0][10][1]
+        p = [max(l,r)] * (m - v+1)
+        if 'KETI_SL_0000041984' in name:
+            p = [max(l,r)] * (m - v)
+        pelvis.extend(p)
     mean_frame_num = int(np.mean(max_frame_ls))
     max_frame_num += 1 # 0부터 시작해서
     video_hand_idx = []
@@ -1146,13 +1154,20 @@ def skip_random_argumentation(data): # random하게 선택
         dt = data[i]['keypoints']
         dt = np.array(dt).reshape(123,3)
         dt = np.delete(dt,range(13,81),axis=0) # 얼굴 키포인트 제외
-        wrist = np.max([dt[9][1], dt[10][1]]) # 허리
-        left_hand = np.mean(dt[:,1][13:34])
-        right_hand = np.mean(dt[:,1][34:])
+        start_number = video_dic['_'.join(video_name[idx].split('.')[0].split('_')[:-1])]
+        head = dt[:,1][11]
+        wrist = pelvis[idx]
+        left_hand_ls = dt[:,1][13:34]
+        right_hand_ls = dt[:,1][34:]
         
-        if (left_hand < wrist) or (right_hand < wrist): # hand 탐지 될 때
-            video_hand_idx.append(int(num2)) # hand frame number
-            hand_frame_ls = np.append(hand_frame_ls,dt[:,:2].flatten())
+        left_hand = np.mean(left_hand_ls)
+        right_hand = np.mean(right_hand_ls)
+
+        if not sum(head > right_hand_ls): # 오차 방지
+            if (left_hand < wrist) or (right_hand < wrist): # hand 탐지 될 때
+
+                video_hand_idx.append(int(num2)) # hand frame number
+                hand_frame_ls = np.append(hand_frame_ls,dt[:,:2].flatten())
             
         mean_x,std_x = np.mean(dt[:,0]),np.std(dt[:,0]) # noramlization
         mean_y,std_y = np.mean(dt[:,1]),np.std(dt[:,1]) # normalization
