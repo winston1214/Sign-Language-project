@@ -2,6 +2,13 @@ import numpy as np
 from tqdm.notebook import tqdm
 import re
 import math
+def combinations_len(n,r):
+    return math.factorial(n)/(math.factorial(r)*math.factorial(n-r))
+def binomial_prob(n,p):
+    prob = []
+    for r in range(n+1):
+        prob.append(combinations_len(n,r) * (p**r) * ((1-p)**(n-r)))
+    return prob
 
 def keti(data): # 전체 frame에 대해서 random하게 증강, sampling
     np.random.seed(42)
@@ -1259,5 +1266,122 @@ def skip_random_argumentation(data): # random하게 선택
             video_hand_idx = []
             
     X_train = np.array(X_train).reshape(-1,mean_frame_num,110)
+    
+    return X_train
+
+def skip_frame_prob_sample(data): # 전체 weighted 를 주면서 샘플링함
+    np.random.seed(42)
+    X_train=np.array([])
+    num_ls = []
+    max_frame_num = 0
+    min_frame_num = []
+    video_set = set()
+    minimum = 1e+5
+    video_dic = {}
+    video_name = [] # video 밀리는 경우 방지(frame이 0번째부터 있지 않을 수 있음)
+    for idx,i in tqdm(enumerate(data)):
+        # print(idx) # 반복 횟수 1
+        # print(i) # video name : KETI_SL_0000035402_0.jpg
+        num2 = i.split('_')[3] # 0
+        num2 = int(re.sub(".jpg", "", num2))
+         # print(num2) # frame number
+        num_ls.append(int(num2))   # num_ls : frame number들의 list   num_ls = [0]
+        video_name.append(i) # video name : KETI_SL_0000035402_90.jpg
+        video_set.add('_'.join(i.split('.')[0].split('_')[:-1]))
+
+    for idx,i in tqdm(enumerate(data)):
+
+        num2 = i.split('_')[3] # 0
+        num2 = int(re.sub(".jpg", "", num2))
+
+        if max_frame_num < num2: # 최댓값 frame 찾기
+            max_frame_num = num2
+            
+        try: 
+            if num_ls[idx+1] - num_ls[idx] <0: # num_ls : frame number들의 list # 123->1로 frame number가 넘어갈때, 1<123이므로 1-123<0
+                min_frame_num.append(minimum) 
+                minimum = 1e+5
+            else:
+                if minimum > num2:
+                    minimum = num2
+        except: # 끝
+            if minimum > num2:
+                minimum = num2
+            min_frame_num.append(minimum)
+    video_set = sorted(list(video_set))
+    for k,v in zip(video_set,min_frame_num):
+        video_dic[k] = v
+    max_frame_num += 1 # 0부터 시작해서
+
+    print('max_frame_num', max_frame_num)
+    max_frame_num = 50
+    n = max_frame_num
+    
+    video_frame = np.array([])
+
+    for idx,i in tqdm(enumerate(data)):
+        num2 = num_ls[idx]
+        dt = data[i]['keypoints']
+        dt = np.array(dt).reshape(123,3)
+        dt = np.delete(dt,range(13,81),axis=0) # 얼굴 키포인트 제외
+        mean_x,std_x = np.mean(dt[:,0]),np.std(dt[:,0]) # noramlization
+        mean_y,std_y = np.mean(dt[:,1]),np.std(dt[:,1]) # normalization
+        normalization_x, normalization_y = (dt[:,0] - mean_x)/std_x, (dt[:,1] - mean_y)/std_y # normalization
+        dt[:,0] = normalization_x # normalization
+        dt[:,1] = normalization_y # normalization
+
+            
+        try:
+            if num_ls[idx+1]-num_ls[idx] < 0: # 비디오 바뀔 때
+                video_frame = np.append(video_frame,dt[:,:2])
+#                 hand_frame_ls = hand_frame_ls.reshape(-1,110)
+                video_frame = video_frame.reshape(-1,110)
+                
+                if video_name[idx] == 'KETI_SL_0000041984_173.jpg':
+                    avg = np.mean([video_frame[100],video_frame[101]],axis=0)
+                    video_frame = np.insert(video_frame,100,avg,axis=0)
+                    video_frame = video_frame.reshape(-1,110)
+                
+                half_prob = binomial_prob(len(video_frame)-1,1/2)
+                qun_prob = binomial_prob(len(video_frame)-1,1/3)
+                qun2_prob = binomial_prob(len(video_frame)-1,2/3)
+                make_prob = np.array(half_prob) + np.array(qun_prob)*0.5 + np.array(qun2_prob)*0.5
+                baseline = []
+
+                for i in range(n):
+                    baseline.append(np.random.choice(range(len(video_frame)),p = make_prob))
+                baseline.sort()
+                select_frame = np.array(baseline)
+#                 select_frame[np.where(select_frame >= len(video_frame))] = len(video_frame)-1
+                video_frame = video_frame[select_frame]
+                X_train = np.append(X_train,video_frame).reshape(-1,110)
+
+                video_frame = np.array([])
+
+            else:
+                video_frame = np.append(video_frame,dt[:,:2])
+        except:
+            video_frame = np.append(video_frame,dt[:,:2])
+            video_frame = video_frame.reshape(-1,110)
+            half_prob = binomial_prob(len(video_frame)-1,1/2)
+            qun_prob = binomial_prob(len(video_frame)-1,1/3)
+            qun2_prob = binomial_prob(len(video_frame)-1,2/3)
+            make_prob = np.array(half_prob) + np.array(qun_prob)*0.5 + np.array(qun2_prob)*0.5
+            make_prob = make_prob/2
+            baseline = []
+
+            for i in range(n):
+                baseline.append(np.random.choice(range(len(video_frame)),p = make_prob))
+            baseline.sort()
+            
+            select_frame = np.array(baseline)
+            video_frame = video_frame[select_frame]
+
+            X_train = np.append(X_train,video_frame).reshape(-1,110)
+
+            video_frame = np.array([])
+
+            
+    X_train = np.array(X_train).reshape(-1,max_frame_num,110)
     
     return X_train
