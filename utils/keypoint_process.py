@@ -92,8 +92,7 @@ def keti(data): # 전체 frame에 대해서 random하게 증강, sampling
                 for i in range(n):
                     baseline.append(y+i*z)
                 select_frame = np.array(baseline) + r
-                if select_frame[-1] >= len(video_frame):
-                    select_frame[-1] = len(video_frame)-1
+                select_frame[np.where(select_frame >= len(video_frame))] = len(video_frame)-1
                 video_frame = video_frame[select_frame]
                 X_train = np.append(X_train,video_frame).reshape(-1,110)
 
@@ -113,8 +112,7 @@ def keti(data): # 전체 frame에 대해서 random하게 증강, sampling
             for i in range(n):
                 baseline.append(y+i*z)
             select_frame = np.array(baseline) + r
-            if select_frame[-1] >= len(video_frame):
-                select_frame[-1] = len(video_frame)-1
+            select_frame[np.where(select_frame >= len(video_frame))] = len(video_frame)-1
             video_frame = video_frame[select_frame]
 
             X_train = np.append(X_train,video_frame).reshape(-1,110)
