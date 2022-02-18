@@ -29,7 +29,7 @@
 
 <a href='https://aihub.or.kr/opendata/keti-data/recognition-laguage/KETI-02-003'>DataSet Download</a>
 
-<img src='https://github.com/winston1214/Sign-Langugage-project/blob/master/picture/sample_data.gif?raw=true' height='50%' width='50%'></img>
+<img src='https://github.com/winston1214/Sign-Language-project/blob/master/picture/sample_data.gif?raw=true' height='50%' width='50%'></img>
 
 ## Enviorment Setting
 ```
@@ -39,7 +39,7 @@ $ sudo apt-get install libyaml-dev
 ```
 - Setting(Alphapose)
 ```
-$ git clone https://github.com/winston1214/Sign-Langugage-project.git && cd Sign-Langugage-project
+$ git clone https://github.com/winston1214/Sign-Language-project.git && cd Sign-Language-project
 $ python setup.py build develop
 ```
 
@@ -63,7 +63,7 @@ python scripts/demo_inference.py --cfg configs/halpe_136/resnet/256x192_res50_lr
 If you use multi-gpu, you don't have to **sp** option
 
 ## Extract KeyPoint
-<img src='https://github.com/winston1214/Sign-Langugage-project/blob/master/picture/alphapose.gif?raw=true'></img>
+<img src='https://github.com/winston1214/Sign-Language-project/blob/master/picture/alphapose.gif?raw=true'></img>
 
 ## Train
 
@@ -85,7 +85,7 @@ $ python train.py --X_path /sign_data/ --save_path pt_file/ \
 $ python inference.py --video ${VIDEO_NAME} --outdir ${SAVE_PATH} --pt ${WEIGHT_PATH} --model ${MODEL NAME}
 ```
 
-You can simply enjoy demo video at the COLAB [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/winston1214/Sign-Langugage-project/blob/master/Inference.ipynb)
+You can simply enjoy demo video at the COLAB [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/winston1214/Sign-Language-project/blob/master/Inference.ipynb)
 
 ## Result
 
@@ -142,7 +142,7 @@ You can simply enjoy demo video at the COLAB [![Open In Colab](https://colab.res
 
 We selected a method that applied the **(HAND+BODY Keypoint) + (All Frame Random Augmentation) + (Frame Noramlization)** technique as the final model.
 
-More experimental results are shown <a href='https://github.com/winston1214/Sign-Langugage-project/blob/master/docs/RESULT.md'>here</a>.
+More experimental results are shown <a href='https://github.com/winston1214/Sign-Language-project/blob/master/docs/RESULT.md'>here</a>.
 
 ## Demo Video
 <a href='https://www.youtube.com/watch?v=4E18JKXhl8w'>youtube link</a>
