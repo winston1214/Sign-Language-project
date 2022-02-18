@@ -1,4 +1,4 @@
-# Sign-Langugage-project
+# Sign-Language-project
 
 ## Contributors
 
