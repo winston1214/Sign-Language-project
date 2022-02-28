@@ -17,7 +17,7 @@ def probability(n):
     qun2_prob = binomial_prob(n-1,2/3)
     make_prob = np.array(half_prob) + np.array(qun_prob) + np.array(qun2_prob)
     make_prob /= 3
-    final_prob = sorted(make_prob[n//2:]) + sorted(make_prob[:n//2],reverse=True)
+    final_prob = sorted(make_prob[:n//2]) + sorted(make_prob[n//2:],reverse=True)
     return final_prob
 
 
