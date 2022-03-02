@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import torch
 import torch.backends.cudnn as cudnn
 import torch.nn as nn
@@ -263,7 +264,7 @@ def BLEU_Evaluate(model,dataloader,criterion, word_to_index,OUTPUT_DIM , device,
     return epoch_loss / len(dataloader), BLEU, acc
 
 
-def BLEU_Evaluate_test(model,dataloader, word_to_index, word_to_index_test, device , max_len = 81,model_name = 'GRU'):
+def BLEU_Evaluate_test(model,dataloader,word_to_index, word_to_index_test, device , max_len = 81,model_name = 'GRU'):
     '''
     src: 번역하고자 하는 keypoint
     word_to_index: korean index 뭉치

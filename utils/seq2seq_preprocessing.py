@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import numpy as np
 import pandas as pd
 import re
@@ -66,9 +67,5 @@ def target_preprocessing(excel_name,mode='asl'):
     return word_to_index,max_tar_len,vocab,decoder_input
 # if __name__ == '__main__':
 #     word_to_index,max_tar_len,vocab,decoder_input = target_preprocessing('../asl_train_target.csv')
-#     print('vocab',vocab)
-#     print('decoder_input',decoder_input.shape)
-# if __name__ == '__main__':
-    # word_to_index,max_tar_len,vocab,decoder_input = target_preprocessing('train_target.csv')
 #     print('vocab',vocab)
 #     print('decoder_input',decoder_input.shape)
