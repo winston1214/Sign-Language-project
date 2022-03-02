@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from model.seq2seq_lstm import LSTM_Encoder,LSTM_Decoder,LSTM_Seq2Seq
 from model.seq2seq_gru_attention import GRU_AT_Decoder, GRU_AT_Encoder, GRU_AT_Seq2Seq, Attention
 from utils.seq2seq_preprocessing import  target_preprocessing
@@ -5,9 +6,11 @@ from utils.train_utils import BLEU_Evaluate_test,init_weights
 import torch
 import torch.utils.data as D
 import torch.backends.cudnn as cudnn
+import torch.nn as nn
 import random
 import numpy as np
 import gzip,pickle
+
 
 import time
 import argparse
@@ -22,15 +25,19 @@ cudnn.benchmark = False
 cudnn.deterministic = True
 random.seed(0)
 
-        
+
 def main_test(opt):
     
     ### Data Loading
     with gzip.open(opt.X_path + 'X_test.pickle','rb') as f:
         X_data = pickle.load(f)
-    excel_name = opt.csv_name # 'C:/Users/winst/Downloads/menmen/train_target.xlsx'
-    word_to_index_test, max_len, _,decoder_input = target_preprocessing(excel_name,'test')
-    word_to_index, _, train_vocab ,_ = target_preprocessing(excel_name,'train')
+    excel_name = 'test.csv' # 'C:/Users/winst/Downloads/menmen/train_target.xlsx'
+    train_excel_name = 'train.csv'
+    if opt.mode == 'asl':
+        excel_name  = 'asl_ann/' + excel_name
+        train_excel_name = 'asl_ann/' + train_excel_name
+    word_to_index_test, max_len, _,decoder_input = target_preprocessing(excel_name,opt.mode)
+    word_to_index, _, train_vocab ,_ = target_preprocessing(train_excel_name,opt.mode)
 
     ## Setting of Hyperparameter
     HID_DIM = opt.hid_dim # 512
@@ -53,7 +60,6 @@ def main_test(opt):
     test_dataloader =  torch.utils.data.DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False)
     
     input_size = X_test.shape[-1] # keypoint vector 길이
-
 
     ## Define Model
     if opt.model == 'LSTM':
@@ -101,5 +107,6 @@ if __name__ == '__main__':
     parser.add_argument('--csv_name',type=str,default='train_target.csv',help='Target Excel name')
     parser.add_argument('--model',type=str,default='GRU',help='[LSTM,GRU]')
     parser.add_argument('--save_csv',type=str,default = './result.csv',help = 'save result csv name')
+    parser.add_argument('--mode',type = str,default='asl')
     opt = parser.parse_args()
     main_test(opt)
