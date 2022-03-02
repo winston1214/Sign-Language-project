@@ -2,7 +2,6 @@ import numpy as np
 import math
 from scipy.spatial.distance import cosine as cos
 
-## normalization method
 def distance_normalization(dt): # Euclidean
     face_r = dt[0] # nose 기준
     body_r = dt[12]
@@ -10,37 +9,33 @@ def distance_normalization(dt): # Euclidean
     rarm_r = dt[10]
     lhand_r = dt[13]
     rhand_r = dt[34]
+
+    c_x,c_y = np.mean(dt[:,0]),np.mean(dt[:,1])
     
-    face_c = np.mean(dt[[0,1,2,3,4,11]],axis=0)
-    body_c = np.mean(dt[[5,6,12]],axis=0)
-    larm_c = np.mean(dt[[7,9]],axis=0)
-    rarm_c = np.mean(dt[[8,10]],axis=0)
-    lhand_c = np.mean(dt[13:34],axis=0)
-    rhand_c = np.mean(dt[34:],axis= 0)
-    
-    face_d = np.sqrt((face_c[0] - face_r[0])**2 + (face_c[1] - face_r[1])**2)
-    body_d = np.sqrt((body_c[0] - body_r[0])**2 + (body_c[1] - body_r[1])**2)
-    larm_d = np.sqrt((larm_c[0] - larm_r[0])**2 + (larm_c[1] - larm_r[1])**2)
-    rarm_d = np.sqrt((rarm_c[0] - rarm_r[0])**2 + (rarm_c[1] - rarm_r[1])**2)
-    lhand_d = np.sqrt((lhand_c[0] - lhand_r[0])**2 + (lhand_c[1] - lhand_r[1])**2)
-    rhand_d = np.sqrt((rhand_c[0] - rhand_r[0])**2 + (rhand_c[1] - rhand_r[1])**2)
+    face_d = np.sqrt((c_x - face_r[0])**2 + (c_y - face_r[1])**2)
+    body_d = np.sqrt((c_x - body_r[0])**2 + (c_y - body_r[1])**2)
+    larm_d = np.sqrt((c_x - larm_r[0])**2 + (c_y - larm_r[1])**2)
+    rarm_d = np.sqrt((c_x - rarm_r[0])**2 + (c_y - rarm_r[1])**2)
+    lhand_d = np.sqrt((c_x - lhand_r[0])**2 + (c_y - lhand_r[1])**2)
+    rhand_d = np.sqrt((c_x - rhand_r[0])**2 + (c_y - rhand_r[1])**2)
     new_dt = np.array([])
     for idx,i in enumerate(dt):
         if idx in [0,1,2,3,4,11]:
-            normal = [(i[0] - face_c[0])/face_d,(i[1] - face_c[1])/face_d]
+            normal = [(i[0] - c_x)/face_d,(i[1] - c_y)/face_d]
         elif idx in [5,6,12]:
-            normal = [(i[0] - body_c[0])/body_d,(i[1] - body_c[1])/body_d]
+            normal = [(i[0] - c_x)/body_d,(i[1] - c_y)/body_d]
         elif idx in [7,9]:
-            normal = [(i[0] - larm_c[0])/larm_d,(i[1] - larm_c[1])/larm_d]
+            normal = [(i[0] - c_x)/larm_d,(i[1] - c_y)/larm_d]
         elif idx in [8,10]:
-            normal = [(i[0] - rarm_c[0])/rarm_d,(i[1] - rarm_c[1])/rarm_d]
+            normal = [(i[0] - c_x)/rarm_d,(i[1] - c_y)/rarm_d]
         elif idx in range(13,34):
-            normal = [(i[0] - lhand_c[0])/lhand_d,(i[1] - lhand_c[1])/lhand_d]
+            normal = [(i[0] - c_x)/lhand_d,(i[1] - c_y)/lhand_d]
         else:
-            normal = [(i[0] - rhand_c[0])/rhand_d,(i[1] - rhand_c[1])/rhand_d]
+            normal = [(i[0] - c_x)/rhand_d,(i[1] - c_y)/rhand_d]
         new_dt = np.append(new_dt,normal)
-    return new_dt.reshape(-1,110)
-def distance_normalization_mix(dt): # Euclidean + cos
+    return new_dt.reshape(55,-1)
+
+def distance_normalization_mix1(dt): # euclidian
     face_r = dt[0] # nose 기준
     body_r = dt[12]
     larm_r = dt[7]
@@ -48,35 +43,41 @@ def distance_normalization_mix(dt): # Euclidean + cos
     lhand_r = dt[13]
     rhand_r = dt[34]
     
-    face_c = np.mean(dt[[0,1,2,3,4,11]],axis=0)
-    body_c = np.mean(dt[[5,6,12]],axis=0)
-    larm_c = np.mean(dt[[7,9]],axis=0)
-    rarm_c = np.mean(dt[[8,10]],axis=0)
-    lhand_c = np.mean(dt[13:34],axis=0)
-    rhand_c = np.mean(dt[34:],axis= 0)
+    center = [np.mean(dt[:,0]),np.mean(dt[:,1])]
+    std = [np.std(dt[:,0]),np.std(dt[:,1])]
     distance = []
-    for c,r in zip([face_c,body_c,larm_c,rarm_c,lhand_c,rhand_c],[face_r,body_r,larm_r,rarm_r,lhand_r,rhand_r]):
-        euc_dis = np.sqrt((c[0]-r[0])**2 + (c[1]-r[1])**2)
+    for c,r in zip([center]*6,[face_r,body_r,larm_r,rarm_r,lhand_r,rhand_r]):
+        euc_dis =  np.sqrt(0.5 * np.var(c-r)/(np.var(c) + np.var(r)))
         cos_dis = cos(c,r)
         distance.append(euc_dis * 0.5 + cos_dis * 0.5)
-    
+
     new_dt = np.array([])
     for idx,i in enumerate(dt):
         if idx in [0,1,2,3,4,11]:
-            normal = [(i[0] - face_c[0])/distance[0],(i[1] - face_c[1])/distance[0]]
+            normal = [distance[0]*(i[0] - center[0])/(std[0]),distance[0]*(i[1] - center[1])/(std[1])]
         elif idx in [5,6,12]:
-            normal = [(i[0] - body_c[0])/distance[1],(i[1] - body_c[1])/distance[1]]
+            normal = [distance[1]*(i[0] - center[0])/(std[0]),distance[1]*(i[1] - center[1])/(std[1])]
         elif idx in [7,9]:
-            normal = [(i[0] - larm_c[0])/distance[2],(i[1] - larm_c[1])/distance[2]]
+            normal = [distance[2]*(i[0] - center[0])/(std[0]),distance[2]*(i[1] - center[1])/(std[1])]
         elif idx in [8,10]:
-            normal = [(i[0] - rarm_c[0])/distance[3],(i[1] - rarm_c[1])/distance[3]]
+            normal = [distance[3]*(i[0] - center[0])/(std[0]),distance[3]*(i[1] - center[1])/(std[1])]
         elif idx in range(13,34):
-            normal = [(i[0] - lhand_c[0])/distance[4],(i[1] - lhand_c[1])/distance[4]]
+            normal = [distance[4]*(i[0] - center[0])/(std[0]),distance[4]*(i[1] - center[1])/(std[1])]
         else:
-            normal = [(i[0] - rhand_c[0])/distance[5],(i[1] - rhand_c[1])/distance[5]]
+            normal = [distance[5]*(i[0] - center[0])/(std[0]),distance[5]*(i[1] - center[1])/(std[1])]
+
         new_dt = np.append(new_dt,normal)
-    return new_dt.reshape(-1,110)
-    
+    return new_dt.reshape(55,-1)
+def distance_normalization_right_shoulder(dt): # Euclidean
+    right_s = dt[6]
+    c_x,c_y = np.mean(dt[:,0]),np.mean(dt[:,1])
+    d = np.sqrt((c_x - right_s[0])**2 + (c_y - right_s[1])**2)
+    new_dt = np.array([])
+    for i in dt:
+        normal = [(i[0] - c_x)/d,(i[1] - c_y)/d]
+        new_dt = np.append(new_dt,normal)
+    return new_dt.reshape(55,-1)
+
 def combinations_len(n,r):
     return math.factorial(n)/(math.factorial(r)*math.factorial(n-r))
 def binomial_prob(n,p):
