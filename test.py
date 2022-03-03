@@ -36,6 +36,9 @@ def main_test(opt):
     if opt.mode == 'asl':
         excel_name  = 'asl_ann/' + excel_name
         train_excel_name = 'asl_ann/' + train_excel_name
+    else:
+        excel_name  = 'keti_ann/' + excel_name
+        train_excel_name = 'keti_ann/' + train_excel_name
     word_to_index_test, max_len, _,decoder_input = target_preprocessing(excel_name,opt.mode)
     word_to_index, _, train_vocab ,_ = target_preprocessing(train_excel_name,opt.mode)
 
