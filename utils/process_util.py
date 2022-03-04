@@ -1,7 +1,46 @@
 import numpy as np
 import math
 from scipy.spatial.distance import cosine as cos
+from sklearn.preprocessing import MinMaxScaler
 
+def robust_normal_minmax(dt): # Euclidean
+    face_r = dt[0] # nose 기준
+    body_r = dt[12]
+    larm_r = dt[7]
+    rarm_r = dt[10]
+    lhand_r = dt[13]
+    rhand_r = dt[34]
+
+    c_x,c_y = np.mean(dt[:,0]),np.mean(dt[:,1])
+    
+    face_d = np.sqrt((c_x - face_r[0])**2 + (c_y - face_r[1])**2)
+    body_d = np.sqrt((c_x - body_r[0])**2 + (c_y - body_r[1])**2)
+    larm_d = np.sqrt((c_x - larm_r[0])**2 + (c_y - larm_r[1])**2)
+    rarm_d = np.sqrt((c_x - rarm_r[0])**2 + (c_y - rarm_r[1])**2)
+    # lhand_d = np.sqrt((c_x - lhand_r[0])**2 + (c_y - lhand_r[1])**2)
+    # rhand_d = np.sqrt((c_x - rhand_r[0])**2 + (c_y - rhand_r[1])**2)
+    for idx,i in enumerate(dt):
+        if idx in [0,1,2,3,4,11]:
+            dt[idx] = [(i[0] - c_x)/face_d,(i[1] - c_y)/face_d]
+        elif idx in [5,6,12]:
+            dt[idx] = [(i[0] - c_x)/body_d,(i[1] - c_y)/body_d]
+        elif idx in [7,9]:
+            dt[idx] = [(i[0] - c_x)/larm_d,(i[1] - c_y)/larm_d]
+        elif idx in [8,10]:
+            dt[idx] = [(i[0] - c_x)/rarm_d,(i[1] - c_y)/rarm_d]
+    scaler = MinMaxScaler()
+    
+    r_x = scaler.fit_transform(dt[13:34][:,0].reshape(-1,1))-0.5
+    r_y = scaler.fit_transform(dt[13:34][:,1].reshape(-1,1))-0.5
+    l_x = scaler.fit_transform(dt[34:][:,0].reshape(-1,1))-0.5
+    l_y = scaler.fit_transform(dt[34:][:,1].reshape(-1,1))-0.5
+    dt[13:34][:,0] =  r_x.reshape(-1)
+    dt[13:34][:,1] = r_y.reshape(-1)
+    dt[34:][:,0] = l_x.reshape(-1)
+    dt[34:][:,1] = l_y.reshape(-1)
+
+    
+    return dt.reshape(55,-1)
 def distance_normalization(dt): # Euclidean
     face_r = dt[0] # nose 기준
     body_r = dt[12]
@@ -35,39 +74,6 @@ def distance_normalization(dt): # Euclidean
         new_dt = np.append(new_dt,normal)
     return new_dt.reshape(55,-1)
 
-def distance_normalization_mix1(dt): # euclidian
-    face_r = dt[0] # nose 기준
-    body_r = dt[12]
-    larm_r = dt[7]
-    rarm_r = dt[10]
-    lhand_r = dt[13]
-    rhand_r = dt[34]
-    
-    center = [np.mean(dt[:,0]),np.mean(dt[:,1])]
-    std = [np.std(dt[:,0]),np.std(dt[:,1])]
-    distance = []
-    for c,r in zip([center]*6,[face_r,body_r,larm_r,rarm_r,lhand_r,rhand_r]):
-        euc_dis =  np.sqrt(0.5 * np.var(c-r)/(np.var(c) + np.var(r)))
-        cos_dis = cos(c,r)
-        distance.append(euc_dis * 0.5 + cos_dis * 0.5)
-
-    new_dt = np.array([])
-    for idx,i in enumerate(dt):
-        if idx in [0,1,2,3,4,11]:
-            normal = [distance[0]*(i[0] - center[0])/(std[0]),distance[0]*(i[1] - center[1])/(std[1])]
-        elif idx in [5,6,12]:
-            normal = [distance[1]*(i[0] - center[0])/(std[0]),distance[1]*(i[1] - center[1])/(std[1])]
-        elif idx in [7,9]:
-            normal = [distance[2]*(i[0] - center[0])/(std[0]),distance[2]*(i[1] - center[1])/(std[1])]
-        elif idx in [8,10]:
-            normal = [distance[3]*(i[0] - center[0])/(std[0]),distance[3]*(i[1] - center[1])/(std[1])]
-        elif idx in range(13,34):
-            normal = [distance[4]*(i[0] - center[0])/(std[0]),distance[4]*(i[1] - center[1])/(std[1])]
-        else:
-            normal = [distance[5]*(i[0] - center[0])/(std[0]),distance[5]*(i[1] - center[1])/(std[1])]
-
-        new_dt = np.append(new_dt,normal)
-    return new_dt.reshape(55,-1)
 def distance_normalization_right_shoulder(dt): # Euclidean
     right_s = dt[6]
     c_x,c_y = np.mean(dt[:,0]),np.mean(dt[:,1])
