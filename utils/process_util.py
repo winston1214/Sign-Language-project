@@ -8,8 +8,8 @@ def robust_normal_minmax(dt): # Euclidean
     body_r = dt[12]
     larm_r = dt[7]
     rarm_r = dt[10]
-    lhand_r = dt[13]
-    rhand_r = dt[34]
+    # lhand_r = dt[13]
+    # rhand_r = dt[34]
 
     c_x,c_y = np.mean(dt[:,0]),np.mean(dt[:,1])
     
