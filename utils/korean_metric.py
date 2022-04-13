@@ -23,22 +23,3 @@ def korean_metric(data):
 
         meteor += nltk.translate.meteor_score.meteor_score([a],p,gamma=0)
     return final_bleu/len(data),rouge_score,meteor/len(data)
-
-def german_bleu(data):
-    pred = data['predict']
-    target = data['answer']
-    rouge = Rouge()
-    rouge_score = rouge.get_scores(pred.values,target.values,avg=True)['rouge-l']['f'] # ROUGE-L
-    pred2 = [p.lower().split() for p in pred]
-    target2 = [[t.lower().split()] for t in target]
-    final = 0
-    meteor = 0
-    for a,p,a2,p2 in zip(target,pred,target2,pred2):
-        n = len(a2[0][0])
-        if n<4:
-            w = [1/n] * n + [0] * (4-n)
-        else:
-            w = [0.25,0.25,0.25,0.25]
-        final += sentence_bleu(a2,p2,weights = w)
-        meteor += nltk.translate.meteor_score.meteor_score([a],p,gamma=0)
-    return final/len(data),rouge_score,meteor/len(data)
