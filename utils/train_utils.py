@@ -11,6 +11,7 @@ import re
 import seaborn as sns
 import matplotlib.pyplot as plt
 import warnings
+from metric.bleu import compute_bleu
 warnings.filterwarnings('ignore')
 
 torch.manual_seed(0)
@@ -69,39 +70,6 @@ def train(model, dataloader, OUTPUT_DIM,optimizer, criterion, clip):
     return epoch_loss / len(dataloader)
 
 
-
-def evaluate(model, dataloader,OUTPUT_DIM, criterion):
-    
-    model.eval()
-    
-    epoch_loss = 0
-    
-    with torch.no_grad():
-   
-      for i,(input, target) in enumerate(dataloader): # valid_dataloader 정의하기
-            src = input
-            trg = target
-
-            if torch.cuda.is_available():
-                model.cuda()
-                src = src.cuda().float()
-                trg = trg.cuda()
-
-            output = model(src, trg, 0)
-            #trg = [trg len, batch size] [16,12]
-            #output = [trg len, batch size, output dim]
-            
-            output = output[1:].view(-1, OUTPUT_DIM)
-            trg = torch.transpose(trg,0,1)
-            trg = trg[1:].contiguous().view(-1)
-                
-            #trg = [(trg len - 1) * batch size]
-            #output = [(trg len - 1) * batch size, output dim]
-            loss = criterion(output, trg)
-            
-            epoch_loss += loss.item()
-            
-    return epoch_loss / len(dataloader)
 
 def translate_SL(src, word_to_index, model, device, max_len = 81):
     '''
@@ -315,7 +283,7 @@ def BLEU_Evaluate_test(model,dataloader,word_to_index, word_to_index_test, devic
             if len(candidate.split()) == 0:
                 zero_pred += 1
             else:
-                BLEU += bleu.sentence_bleu([ref.split()], candidate.split(),weights = [1,0,0,0])
+                BLEU += compute_bleu([ref.split()], candidate.split())[0]
                 acc += sum(x == y for x, y in zip(ref.split(), candidate.split())) / len(candidate.split())
         
     print('zero : ',zero_pred)

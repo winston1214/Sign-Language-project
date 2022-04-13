@@ -10,7 +10,7 @@ from utils.pad_sequences import pad_sequences
 
 import nltk
 from nltk.tokenize import word_tokenize
-
+from konlpy.tag import Mecab
 
 
 def target_preprocessing(excel_name,mode='asl'):
@@ -35,7 +35,11 @@ def target_preprocessing(excel_name,mode='asl'):
 
     for sentence in temp:
         # 단어 토큰화
-        tokenized_sentence = word_tokenize(sentence)
+        if mode == 'asl':   
+            tokenized_sentence = word_tokenize(sentence)
+        else:
+            mecab = Mecab()
+            tokenized_sentence = mecab.morphs(sentence)
         result = []
 
         for word in tokenized_sentence:
