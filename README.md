@@ -164,7 +164,7 @@ More experimental results are shown <a href='https://github.com/winston1214/Sign
 https://user-images.githubusercontent.com/47775179/150514151-e50bb76c-7556-42dd-bad3-24ffd2047066.mp4
 
 
-## License
+## Citation
 
 ```
 @misc{https://doi.org/10.48550/arxiv.2204.10511,
