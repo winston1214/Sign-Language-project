@@ -164,5 +164,26 @@ More experimental results are shown <a href='https://github.com/winston1214/Sign
 https://user-images.githubusercontent.com/47775179/150514151-e50bb76c-7556-42dd-bad3-24ffd2047066.mp4
 
 
+## License
+
+```
+@misc{https://doi.org/10.48550/arxiv.2204.10511,
+  doi = {10.48550/ARXIV.2204.10511},
+  
+  url = {https://arxiv.org/abs/2204.10511},
+  
+  author = {Kim, Youngmin and Kwak, Minji and Lee, Dain and Kim, Yeongeun and Baek, Hyeongboo},
+  
+  keywords = {Computer Vision and Pattern Recognition (cs.CV), FOS: Computer and information sciences, FOS: Computer and information sciences},
+  
+  title = {Keypoint based Sign Language Translation without Glosses},
+  
+  publisher = {arXiv},
+  
+  year = {2022},
+  
+  copyright = {Creative Commons Attribution 4.0 International}
+}
+```
 
 
