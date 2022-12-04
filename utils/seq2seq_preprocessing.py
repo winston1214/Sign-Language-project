@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import numpy as np
 import pandas as pd
 import re
@@ -9,26 +10,21 @@ from utils.pad_sequences import pad_sequences
 
 import nltk
 from nltk.tokenize import word_tokenize
+from konlpy.tag import Mecab
 
 
-
-def target_preprocessing(excel_name,mode='train'):
+def target_preprocessing(excel_name,mode='asl'):
     
     nltk.download('punkt')
 
     target = pd.read_csv(excel_name)
     
     # 여기서 추출하는 과정 거쳐야함(원하는 인덱스 비디오만 추출하는 과정)
-    if mode == 'train':
-        target1 = target[(target['num'] <= 35620) & (target['num'] >= 30593)]
-        target2 = target[(target['num'] <= 42131) & (target['num'] >= 40028)]
-        target = target1.append(target2)
-        drop_idx = target.loc[(target['num']== 41098) | (target['num'] == 41106) | (target['num'] == 41108)].index
-        target.drop(drop_idx,axis=0,inplace=True)
-    elif mode == 'test':
-        target = target[(target['num'] <= 43177) & (target['num'] >= 42303)]
-    
-    target = target['target'].map(lambda x: re.sub('[(-,)=.#/?:!$}]','', x)) # 부가적인 전처리
+#     target = target.sort_values('num').reset_index(drop=True)
+    if mode == 'asl':
+        target = target['translation'].map(lambda x: re.sub('[(-,)=.#/?:!$}]','', x)) # 부가적인 전처리
+    else:
+        target = target['target'].map(lambda x: re.sub('[(-,)=.#/?:!$}]','', x)) # 부가적인 전처리
     target = target.apply(lambda x : 's '+ x + ' f')
 
     temp = target.values.tolist() # 단어 집합 구축
@@ -39,7 +35,11 @@ def target_preprocessing(excel_name,mode='train'):
 
     for sentence in temp:
         # 단어 토큰화
-        tokenized_sentence = word_tokenize(sentence)
+        if mode == 'asl':   
+            tokenized_sentence = word_tokenize(sentence)
+        else:
+            mecab = Mecab()
+            tokenized_sentence = mecab.morphs(sentence)
         result = []
 
         for word in tokenized_sentence:
@@ -70,6 +70,6 @@ def target_preprocessing(excel_name,mode='train'):
 
     return word_to_index,max_tar_len,vocab,decoder_input
 # if __name__ == '__main__':
-    # word_to_index,max_tar_len,vocab,decoder_input = target_preprocessing('train_target.csv')
+#     word_to_index,max_tar_len,vocab,decoder_input = target_preprocessing('../asl_train_target.csv')
 #     print('vocab',vocab)
 #     print('decoder_input',decoder_input.shape)

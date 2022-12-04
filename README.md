@@ -1,4 +1,4 @@
-# Sign-Langugage-project
+# Sign-Language-project
 
 ## Contributors
 
@@ -10,6 +10,20 @@
       <td align="center"><a href="https://github.com/yyeongeun"><img src="https://avatars.githubusercontent.com/u/70632327?v=4" width="100" height="100"><br /><sub><b>김영은</b></sub></td> 
      </tr>
 </table>
+
+## Abstract
+<div align="center">
+  📑<a href='https://arxiv.org/abs/2204.10511'>Keypoint based Sign Language Translation without glosses</a>
+</div>
+Sign Language Translation (SLT) is a task that has not been studied relatively much compared to the study of Sign Language Recognition (SLR). 
+However, the SLR is a study that recognizes the unique grammar of sign language, which is different from the spoken language and has a problem that non-disabled people cannot easily interpret.
+So, we're going to solve the problem of translating directly spoken language in sign language video. 
+To this end, we propose a new keypoint normalization method for performing translation based on the skeleton point of the signer and robustly normalizing these points in sign language translation. 
+<b>It contributed to performance improvement by a customized normalization method depending on the body parts.</b>
+<b>In addition, we propose a stochastic frame selection method that enables frame augmentation and sampling at the same time.</b>
+Finally, it is translated into the spoken language through an <b>Attention-based translation model.</b>
+Our method can be applied to various datasets in a way that can be applied to datasets <b>without glosses</b>. 
+In addition, quantitative experimental evaluation proved the excellence of our method.
 
 ## Survey
 
@@ -29,7 +43,7 @@
 
 <a href='https://aihub.or.kr/opendata/keti-data/recognition-laguage/KETI-02-003'>DataSet Download</a>
 
-<img src='https://github.com/winston1214/Sign-Langugage-project/blob/master/picture/sample_data.gif?raw=true' height='50%' width='50%'></img>
+<img src='https://github.com/winston1214/Sign-Language-project/blob/master/picture/sample_data.gif?raw=true' height='50%' width='50%'></img>
 
 ## Enviorment Setting
 ```
@@ -39,7 +53,7 @@ $ sudo apt-get install libyaml-dev
 ```
 - Setting(Alphapose)
 ```
-$ git clone https://github.com/winston1214/Sign-Langugage-project.git && cd Sign-Langugage-project
+$ git clone https://github.com/winston1214/Sign-Language-project.git && cd Sign-Language-project
 $ python setup.py build develop
 ```
 
@@ -63,7 +77,7 @@ python scripts/demo_inference.py --cfg configs/halpe_136/resnet/256x192_res50_lr
 If you use multi-gpu, you don't have to **sp** option
 
 ## Extract KeyPoint
-<img src='https://github.com/winston1214/Sign-Langugage-project/blob/master/picture/alphapose.gif?raw=true'></img>
+<img src='https://github.com/winston1214/Sign-Language-project/blob/master/picture/alphapose.gif?raw=true'></img>
 
 ## Train
 
@@ -85,7 +99,7 @@ $ python train.py --X_path /sign_data/ --save_path pt_file/ \
 $ python inference.py --video ${VIDEO_NAME} --outdir ${SAVE_PATH} --pt ${WEIGHT_PATH} --model ${MODEL NAME}
 ```
 
-You can simply enjoy demo video at the COLAB [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/winston1214/Sign-Langugage-project/blob/master/Inference.ipynb)
+You can simply enjoy demo video at the COLAB [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/winston1214/Sign-Language-project/blob/master/Inference.ipynb)
 
 ## Result
 
@@ -140,9 +154,9 @@ You can simply enjoy demo video at the COLAB [![Open In Colab](https://colab.res
     </tbody>
 </table>
 
-We selected a method that applied the **(HAND+BODY Keypoint) + (All Frame Random Argumentation) + (Frame Noramlization)** technique as the final model.
+We selected a method that applied the **(HAND+BODY Keypoint) + (All Frame Random Augmentation) + (Frame Noramlization)** technique as the final model.
 
-More experimental results are shown <a href='https://github.com/winston1214/Sign-Langugage-project/blob/master/docs/RESULT.md'>here</a>.
+More experimental results are shown <a href='https://github.com/winston1214/Sign-Language-project/blob/master/docs/RESULT.md'>here</a>.
 
 ## Demo Video
 <a href='https://www.youtube.com/watch?v=4E18JKXhl8w'>youtube link</a>
@@ -150,5 +164,26 @@ More experimental results are shown <a href='https://github.com/winston1214/Sign
 https://user-images.githubusercontent.com/47775179/150514151-e50bb76c-7556-42dd-bad3-24ffd2047066.mp4
 
 
+## Citation
+
+```
+@misc{https://doi.org/10.48550/arxiv.2204.10511,
+  doi = {10.48550/ARXIV.2204.10511},
+  
+  url = {https://arxiv.org/abs/2204.10511},
+  
+  author = {Kim, Youngmin and Kwak, Minji and Lee, Dain and Kim, Yeongeun and Baek, Hyeongboo},
+  
+  keywords = {Computer Vision and Pattern Recognition (cs.CV), FOS: Computer and information sciences, FOS: Computer and information sciences},
+  
+  title = {Keypoint based Sign Language Translation without Glosses},
+  
+  publisher = {arXiv},
+  
+  year = {2022},
+  
+  copyright = {Creative Commons Attribution 4.0 International}
+}
+```
 
 
