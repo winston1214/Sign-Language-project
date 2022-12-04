@@ -554,7 +554,7 @@ def write_json(all_results,outputpath, form=None, for_eval=False):
                     numpy_result = numpy_result.reshape(-1, 3)
                     delete_list = (11,12,13,14,15,16,19,20,21,22,23,24,25)
                     numpy_result = np.delete(numpy_result,delete_list, axis=0)
-
+                    print(numpy_result)
                     json_results_cmu[result['image_id']] = {}
                     json_results_cmu[result['image_id']]['keypoints'] = []
                     json_results_cmu[result['image_id']]['keypoints'].append(numpy_result.tolist())
